@@ -1,5 +1,9 @@
+using YummyApi.WebApi.Context;
+
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.Services.AddDbContext<ApiContext>();
 // Add services to the container.
 
 builder.Services.AddControllers();
