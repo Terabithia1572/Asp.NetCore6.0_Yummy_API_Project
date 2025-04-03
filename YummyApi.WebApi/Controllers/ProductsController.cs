@@ -40,5 +40,48 @@ namespace YummyApi.WebApi.Controllers
                 return BadRequest(validatorResult.Errors);
             }
         }
+        [HttpDelete]
+        public IActionResult DeleteProduct(int id)
+        {
+            var product = _apiContext.Products.Find(id);
+            if (product != null)
+            {
+                _apiContext.Products.Remove(product);
+                _apiContext.SaveChanges();
+                return Ok("Ürün Silindi...");
+            }
+            else
+            {
+                return NotFound("Ürün Bulunamadı...");
+            }
+        }
+        [HttpGet("GetProduct")]
+        public IActionResult GetProduct(int id)
+        {
+            var product = _apiContext.Products.Find(id);
+            if (product != null)
+            {
+                return Ok(product);
+            }
+            else
+            {
+                return NotFound("Ürün Bulunamadı...");
+            }
+        }
+        [HttpPut]
+        public IActionResult UpdateProduct(Product product)
+        {
+            var validatorResult = _validator.Validate(product);
+            if (validatorResult.IsValid)
+            {
+                _apiContext.Products.Update(product);
+                _apiContext.SaveChanges();
+                return Ok("Ürün Başarıyla Güncellendi..");
+            }
+            else
+            {
+                return BadRequest(validatorResult.Errors);
+            }
+        }
     }
 }
