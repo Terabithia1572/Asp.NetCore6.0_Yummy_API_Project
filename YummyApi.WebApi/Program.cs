@@ -1,10 +1,15 @@
+using FluentValidation;
 using System.Reflection;
 using YummyApi.WebApi.Context;
+using YummyApi.WebApi.Entities;
+using YummyApi.WebApi.ValidationRules;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddDbContext<ApiContext>();
+
+builder.Services.AddScoped<IValidator<Product>, ProductValidator>();
 // Add services to the container.
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 //AutoMapper'ý baðýmlýlýk enjeksiyonu(Dependency Injection) ile projeye ekleyerek tüm mapping iþlemlerini otomatik yükler ve her yerde kullanýlabilir hale getirir.
