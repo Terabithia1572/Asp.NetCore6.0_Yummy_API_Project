@@ -1,7 +1,9 @@
-﻿using FluentValidation;
+﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using YummyApi.WebApi.Context;
+using YummyApi.WebApi.DTOs.ProductDTOs;
 using YummyApi.WebApi.Entities;
 
 namespace YummyApi.WebApi.Controllers
@@ -12,11 +14,13 @@ namespace YummyApi.WebApi.Controllers
     {
         private readonly IValidator<Product> _validator;
         private readonly ApiContext _apiContext;
+        private readonly IMapper _mapper;
 
-        public ProductsController(IValidator<Product> validator, ApiContext apiContext)
+        public ProductsController(IValidator<Product> validator, ApiContext apiContext, IMapper mapper)
         {
             _validator = validator;
             _apiContext = apiContext;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -82,6 +86,14 @@ namespace YummyApi.WebApi.Controllers
             {
                 return BadRequest(validatorResult.Errors);
             }
+        }
+        [HttpPost("CreateProductWithCategory")]
+        public IActionResult CreateProductWithCategory(CreateProductDTO createProductDTO)
+        {
+            var values=_mapper.Map<Product>(createProductDTO);
+            _apiContext.Products.Add(values);
+            _apiContext.SaveChanges();
+            return Ok("Ürün Ekleme İşlemi Başarılı..");
         }
     }
 }
