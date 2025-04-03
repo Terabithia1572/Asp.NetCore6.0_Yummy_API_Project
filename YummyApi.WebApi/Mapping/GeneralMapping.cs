@@ -26,6 +26,10 @@ namespace YummyApi.WebApi.Mapping
             CreateMap<Message, GetByIDMessageDTO>().ReverseMap();
 
             CreateMap<Product, CreateProductDTO>().ReverseMap();
+            CreateMap<Product, ResultProductWithCategoryDTO>().ForMember(x=>x.CategoryName,y=>y.MapFrom(z=>z.Category.CategoryName)).ReverseMap();
+            //ForMember burada önemli burada 3 parametre geçtik
+            //1.parametre getirmek istediğim yani hangi propertyleri getirmek istedim CategoryName getirmek istedim
+            //2.parametre Bu Kategori adını nereden getireceğim Category tablosundan Kategori Adını Getir Dedik
         }
     }
 }

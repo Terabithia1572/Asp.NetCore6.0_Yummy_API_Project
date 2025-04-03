@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using YummyApi.WebApi.Context;
 using YummyApi.WebApi.DTOs.ProductDTOs;
 using YummyApi.WebApi.Entities;
@@ -94,6 +95,12 @@ namespace YummyApi.WebApi.Controllers
             _apiContext.Products.Add(values);
             _apiContext.SaveChanges();
             return Ok("Ürün Ekleme İşlemi Başarılı..");
+        }
+        [HttpGet("ProductListWithCategory")]
+        public IActionResult ProductListWithCategory()
+        {
+            var values = _apiContext.Products.Include(x => x.Category).ToList();
+            return Ok(_mapper.Map<List<ResultProductWithCategoryDTO>>(values));
         }
     }
 }
