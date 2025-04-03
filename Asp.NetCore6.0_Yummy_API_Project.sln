@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YummyApi.WebApi", "YummyApi.WebApi\YummyApi.WebApi.csproj", "{9A9AD936-BABF-437A-BF35-383B27FB9208}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YummyApi.WebUI", "YummyApi.WebUI\YummyApi.WebUI.csproj", "{F31CB0E1-A8EE-4F97-BE83-3F231316BBF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{9A9AD936-BABF-437A-BF35-383B27FB9208}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A9AD936-BABF-437A-BF35-383B27FB9208}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A9AD936-BABF-437A-BF35-383B27FB9208}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F31CB0E1-A8EE-4F97-BE83-3F231316BBF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F31CB0E1-A8EE-4F97-BE83-3F231316BBF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F31CB0E1-A8EE-4F97-BE83-3F231316BBF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F31CB0E1-A8EE-4F97-BE83-3F231316BBF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
