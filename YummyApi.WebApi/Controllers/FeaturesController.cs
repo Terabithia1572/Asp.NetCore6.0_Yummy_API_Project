@@ -32,6 +32,7 @@ namespace YummyApi.WebApi.Controllers
         {
             var values=_mapper.Map<Feature>(createFeatureDTO);
             _apiContext.Features.Add(values);
+            _apiContext.SaveChanges();
             return Ok("Özellik Ekleme İşlemi Başarılı..");
         }
         [HttpDelete]
@@ -43,6 +44,7 @@ namespace YummyApi.WebApi.Controllers
                 return NotFound("Özellik Bulunamadı..");
             }
             _apiContext.Features.Remove(values);
+            _apiContext.SaveChanges();
             return Ok("Özellik Silme İşlemi Başarılı..");
         }
         [HttpGet("{GetFeature}")]
@@ -61,6 +63,7 @@ namespace YummyApi.WebApi.Controllers
         {
             var values = _mapper.Map<Feature>(updateFeatureDTO);
             _apiContext.Features.Update(values);
+            _apiContext.SaveChanges();
             return Ok("Özellik Güncelleme İşlemi Başarılı..");
         }
     }
