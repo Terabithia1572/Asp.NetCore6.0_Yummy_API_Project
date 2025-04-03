@@ -1,3 +1,4 @@
+using System.Reflection;
 using YummyApi.WebApi.Context;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,6 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApiContext>();
 // Add services to the container.
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+//AutoMapper'ý baðýmlýlýk enjeksiyonu(Dependency Injection) ile projeye ekleyerek tüm mapping iþlemlerini otomatik yükler ve her yerde kullanýlabilir hale getirir.
+//Bu kod, AutoMapper'ý dependency injection (DI) sistemine ekler ve mevcut projedeki tüm AutoMapper profillerini otomatik olarak yükler. Böylece IMapper nesnesini projede rahatça kullanabiliriz.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
