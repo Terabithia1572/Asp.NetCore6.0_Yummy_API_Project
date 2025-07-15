@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using YummyApi.WebApi.Context;
+using YummyApi.WebApi.DTOs.CategoryDTOs;
+using YummyApi.WebApi.DTOs.FeatureDTOs;
 using YummyApi.WebApi.Entities;
 
 namespace YummyApi.WebApi.Controllers
@@ -10,10 +14,12 @@ namespace YummyApi.WebApi.Controllers
     public class CategoriesController : ControllerBase
     {
         private readonly ApiContext _context;
+        private readonly IMapper _mapper;
 
-        public CategoriesController(ApiContext context)
+        public CategoriesController(ApiContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [HttpGet]
         public IActionResult CategoryList()
@@ -23,10 +29,13 @@ namespace YummyApi.WebApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateCategory(Category category)
+        public IActionResult CreateCategory(CreateCategoryDTO createCategoryDTO)
         {
-            _context.Categories.Add(category);
-            _context.SaveChanges(); //değişiklikleri kaydet
+            //_context.Categories.Add(category);
+            //_context.SaveChanges(); //değişiklikleri kaydet
+            var values = _mapper.Map<Category>(createCategoryDTO);
+            _context.Categories.Add(values);
+            _context.SaveChanges();
             return Ok("Kategori Ekleme İşlemi Başarılı.."); //200 kodu döner kategori ekleme işlemi başarılı
         }
         [HttpDelete]

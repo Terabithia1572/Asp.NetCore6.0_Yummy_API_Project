@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Text;
 using YummyApi.WebUI.DTOs.CategoryDTOs;
 
 namespace YummyApi.WebUI.Controllers
@@ -42,6 +43,34 @@ namespace YummyApi.WebUI.Controllers
                 return RedirectToAction("CategoryList"); // Kategori listesini görüntülemek için CategoryList eylemine yönlendirir.
             }
             return View(); // Eğer yanıt başarısızsa, aynı görünümü tekrar gösterir.
+        }
+
+        public async Task<IActionResult> DeleteCategory(int id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            await client.DeleteAsync("https://localhost:44368/api/Categories?id=" + id);
+            return RedirectToAction("CategoryList");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> UpdateCategory(int id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var responseMessage = await client.GetAsync("https://localhost:44368/api/Categories/GetCategory?id=" + id);
+            var jsonData = await responseMessage.Content.ReadAsStringAsync();
+            var value = JsonConvert.DeserializeObject<GetCategoryByIDDTO>(jsonData);
+            return View(value);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateCategory(UpdateCategoryDTO updateCategoryDto)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var jsonData = JsonConvert.SerializeObject(updateCategoryDto);
+            StringContent stringContent = new StringContent(jsonData, Encoding.UTF8, "application/json");
+            await client.PutAsync("https://localhost:44368/api/Categories/", stringContent);
+            return RedirectToAction("CategoryList");
         }
     }
 }
