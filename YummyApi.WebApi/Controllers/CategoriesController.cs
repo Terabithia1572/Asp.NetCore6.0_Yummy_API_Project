@@ -50,7 +50,7 @@ namespace YummyApi.WebApi.Controllers
             _context.SaveChanges(); //değişiklikleri kaydet
             return Ok("Kategori Silme İşlemi Başarılı.."); //200 kodu döner kategori silme işlemi başarılı
         }
-        [HttpGet("{id}")]
+        [HttpGet("{GetCategory}")]
         public IActionResult GetCategory(int id)
         {
             var category = _context.Categories.Find(id);
@@ -61,10 +61,13 @@ namespace YummyApi.WebApi.Controllers
             return Ok(category); //200 kodu döner ve kategori bilgilerini getirir
         }
         [HttpPut]
-        public IActionResult UpdateCategory(Category category)
+        public IActionResult UpdateCategory(UpdateCategoryDTO updateCategoryDTO)
         {
-            _context.Categories.Update(category);
-            _context.SaveChanges(); //değişiklikleri kaydet
+            //_context.Categories.Update(category);
+            //_context.SaveChanges(); //değişiklikleri kaydet
+            var values = _mapper.Map<Category>(updateCategoryDTO);
+            _context.Categories.Update(values);
+            _context.SaveChanges();
             return Ok("Kategori Güncelleme İşlemi Başarılı.."); //200 kodu döner kategori güncelleme işlemi başarılı
         }
     }

@@ -41,7 +41,8 @@ namespace YummyApi.WebApi.Mapping
             CreateMap<Notification, UpdateNotificationDTO>().ReverseMap();
 
 
-            CreateMap<Category, CreateCategoryDTO>().ReverseMap(); 
+            CreateMap<Category, CreateCategoryDTO>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
         }
     }
 }
