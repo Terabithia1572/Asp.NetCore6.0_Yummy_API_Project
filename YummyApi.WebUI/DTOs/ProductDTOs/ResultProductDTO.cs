@@ -9,5 +9,6 @@
         public string ProductImageURL { get; set; } //Ürün Resmi URL
 
         public int CategoryID { get; set; } //? Boş geçilebilir anlamı katıyor.. Kategori ile Ürünleri İlişkili hale getirdik
+        public string CategoryName { get; set; } //Kategorinin burada adını aldık 
     }
 }
