@@ -56,7 +56,7 @@ namespace YummyApi.WebUI.Controllers
         public async Task<IActionResult> UpdateWhyChooseYummy(int id)
         {
             var client = _httpClientFactory.CreateClient(); // Bu satır, denetleyiciye enjekte edilen fabrikayı kullanarak bir HTTP istemci örneği oluşturur.
-            var responseMessage = await client.GetAsync("https://localhost:44368/api/Services/GetService?id=" + id); // Belirtilen ID'ye sahip servisin bilgilerini almak için HTTP GET isteği gönderir.
+            var responseMessage = await client.GetAsync("https://localhost:44368/api/Services/" + id); // Belirtilen ID'ye sahip servisin bilgilerini almak için HTTP GET isteği gönderir.
             var jsonData = await responseMessage.Content.ReadAsStringAsync(); // JSON verisini okur.
             var value = JsonConvert.DeserializeObject<GetWhyChooseYummyByIDDTO>(jsonData); // JSON verisini GetWhyChooseYummyByIDDTO nesnesine dönüştürür.
             return View(value);
