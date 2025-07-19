@@ -5,6 +5,7 @@ using YummyApi.WebApi.DTOs.FeatureDTOs;
 using YummyApi.WebApi.DTOs.MessageDTO;
 using YummyApi.WebApi.DTOs.NotificationDTOs;
 using YummyApi.WebApi.DTOs.ProductDTOs;
+using YummyApi.WebApi.DTOs.RezervationDTOs;
 using YummyApi.WebApi.Entities;
 
 namespace YummyApi.WebApi.Mapping
@@ -50,6 +51,11 @@ namespace YummyApi.WebApi.Mapping
             CreateMap<About, CreateAboutDTO>().ReverseMap(); //Hakkında Oluşturma DTO'su
             CreateMap<About, UpdateAboutDTO>().ReverseMap(); //Hakkında Güncelleme DTO'su
             CreateMap<About, GetAboutByIDDTO>().ReverseMap(); //ID ile Hakkında Getirme DTO'su
+
+            CreateMap<Reservation, CreateRezervationDTO>().ReverseMap(); //Rezervasyon Oluşturma DTO'su
+            CreateMap<Reservation, UpdateRezervationDTO>().ReverseMap(); //Rezervasyon Güncelleme DTO'su
+            CreateMap<Reservation, ResultRezervationDTO>().ReverseMap(); //Rezervasyon Sonuç DTO'su
+            CreateMap<Reservation, GetRezervationByIDDTO>().ReverseMap(); //ID ile Rezervasyon Getirme DTO'su
         }
     }
 }
