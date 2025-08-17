@@ -1,4 +1,4 @@
-﻿@model GetMessageByIDDTO
+﻿@model YummyApi.WebUI.DTOs.MessageDTOs.GetMessageByIDDTO
 @{
     ViewData["Title"] = "AnswerMessageWithOpenAI";
     Layout = "~/Views/AdminLayout/Index.cshtml";
@@ -18,12 +18,16 @@
 
                             <div class="form-group">
                                 <label>Müşteri Mesajı</label>
+                                <!-- Sadece müşterinin mesajı burada -->
                                 <textarea class="form-control msg-box" asp-for="MessageDetail"></textarea>
                             </div>
 
                             <div class="form-group">
                                 <label>Open AI Otomatik Yanıtı</label>
-                                <textarea class="form-control msg-box" readonly placeholder="(Buraya otomatik yanıt gelecek)"></textarea>
+                                <!-- AI cevabını buraya basıyoruz -->
+                                <textarea class="form-control msg-box" readonly placeholder="(Buraya otomatik yanıt gelecek)">
+@((ViewBag.answerAI as string) ?? "")
+                </textarea>
                             </div>
 
                             <button class="btn btn-success">Cevabı Mail ile Gönder</button>
@@ -36,12 +40,11 @@
 </section>
 
 <style>
-    /* Tek yerde kontrol: rows/height çakışmasın, esnek kalsın */
     .msg-box {
-        min-height: 200px; /* senin hedefin */
-        max-height: 60vh; /* ekranı taşırmasın */
-        overflow: auto; /* içeride kaydır */
-        resize: vertical; /* istersen kullanıcı boyutlandırabilsin */
-        white-space: pre-wrap; /* satır sonlarını koru */
+        min-height: 200px;
+        max-height: 60vh;
+        overflow: auto;
+        resize: vertical;
+        white-space: pre-wrap;
     }
 </style>

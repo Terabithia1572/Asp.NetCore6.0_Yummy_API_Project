@@ -1,17 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Text;
 using YummyApi.WebUI.DTOs.MessageDTOs;
+using static YummyApi.WebUI.Controllers.AIController;
 
 namespace YummyApi.WebUI.Controllers
 {
+    // DeepSeek yanıt modeli (OpenAI ile neredeyse aynı şema)
+    public class ChatResponse
+    {
+        public Choice[] choices { get; set; }
+        public class Choice
+        {
+            public Message message { get; set; }
+        }
+        public class Message
+        {
+            public string role { get; set; }
+            public string content { get; set; }
+        }
+    }
+
     public class MessageController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        public MessageController(IHttpClientFactory httpClientFactory)
+        public MessageController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
 
         public async Task<IActionResult> MessageList()
@@ -74,14 +93,71 @@ namespace YummyApi.WebUI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> AnswerMessageWithOpenAI(int id)
+        public async Task<IActionResult> AnswerMessageWithOpenAI(int id, string prompt)
         {
+            // 1) Mesajı kendi API'nden al
             var client = _httpClientFactory.CreateClient();
-            var responseMessage = await client.GetAsync("https://localhost:44368/api/Messages/GetMessage?id=" + id);
+            var responseMessage = await client.GetAsync($"https://localhost:44368/api/Messages/GetMessage?id={id}");
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                ViewBag.answerAI = "Mesaj alınamadı.";
+                return View(new GetMessageByIDDTO { MessageID = id });
+            }
+
             var jsonData = await responseMessage.Content.ReadAsStringAsync();
             var value = JsonConvert.DeserializeObject<GetMessageByIDDTO>(jsonData);
+
+            // 2) Prompt hazırla
+            prompt = value?.MessageDetail ?? string.Empty;
+
+            // 3) OpenRouter API anahtarı (Secrets/ENV)
+            var apiKey = _configuration["OpenRouter:ApiKey"]
+                         ?? Environment.GetEnvironmentVariable("OPENROUTER_API_KEY");
+
+            if (string.IsNullOrWhiteSpace(apiKey))
+            {
+                ViewBag.answerAI = "OpenRouter API anahtarı bulunamadı.";
+                return View(value);
+            }
+
+            // 4) OpenRouter'a istek gönder (DeepSeek R1: free)
+            using var http = _httpClientFactory.CreateClient();
+            http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+            http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            // Önerilen ek başlıklar:
+            http.DefaultRequestHeaders.Add("HTTP-Referer", "http://localhost"); // kendi siten/adresin
+            http.DefaultRequestHeaders.Add("X-Title", "Yummy Admin");           // uygulama adı
+
+            var requestBody = new
+            {
+                model = "deepseek/deepseek-r1:free",
+                messages = new[]
+                {
+            new { role = "system", content =
+                "Sen bir restoran için müşterilere nazik, profesyonel ve çözüm odaklı e-posta yanıtları yazan bir asistansın. " +
+                "Müşteri memnuniyetini önceliklendir; teşekkür et, gerekirse özür dile, net çözüm önerileri ver; kısa ve anlaşılır paragraflar kullan."},
+            new { role = "user", content = prompt }
+        },
+                temperature = 0.7
+            };
+
+            var resp = await http.PostAsJsonAsync("https://openrouter.ai/api/v1/chat/completions", requestBody);
+
+            if (resp.IsSuccessStatusCode)
+            {
+                var result = await resp.Content.ReadFromJsonAsync<ChatResponse>();
+                var content = result?.choices?.FirstOrDefault()?.message?.content?.Trim();
+                ViewBag.answerAI = string.IsNullOrWhiteSpace(content) ? "Yanıt boş döndü." : content;
+            }
+            else
+            {
+                var err = await resp.Content.ReadAsStringAsync();
+                ViewBag.answerAI = $"OpenRouter hatası: {(int)resp.StatusCode} {resp.ReasonPhrase}\n{err}";
+            }
+
             return View(value);
         }
+
         [HttpGet]
         public async Task<IActionResult> GetMessageJson(int id)
         {
