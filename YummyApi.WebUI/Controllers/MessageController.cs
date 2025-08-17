@@ -72,5 +72,33 @@ namespace YummyApi.WebUI.Controllers
             await client.PutAsync("https://localhost:44368/api/Messages/", stringContent);
             return RedirectToAction("MessageList");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> AnswerMessageWithOpenAI(int id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var responseMessage = await client.GetAsync("https://localhost:44368/api/Messages/GetMessage?id=" + id);
+            var jsonData = await responseMessage.Content.ReadAsStringAsync();
+            var value = JsonConvert.DeserializeObject<GetMessageByIDDTO>(jsonData);
+            return View(value);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetMessageJson(int id)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.GetAsync($"https://localhost:44368/api/Messages/GetMessage?id={id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                // API tarafındaki hata kodunu koruyalım (404/500 vs.)
+                var errorBody = await response.Content.ReadAsStringAsync();
+                return StatusCode((int)response.StatusCode, errorBody);
+            }
+
+            var json = await response.Content.ReadAsStringAsync();
+            var dto = JsonConvert.DeserializeObject<GetMessageByIDDTO>(json);
+            return Json(dto); // same-origin JSON
+        }
+
     }
 }

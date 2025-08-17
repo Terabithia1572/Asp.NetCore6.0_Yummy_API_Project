@@ -32,32 +32,174 @@
                                 {
                                     count++;
                                     <tr>
-
                                         <th scope="row">@count</th>
                                         <td>@item.MessageNameSurname</td>
                                         <td>@item.MessageEmail</td>
                                         <td>@item.MessageSubject</td>
                                         <td>@item.SendDate.ToString("dd MMM yyyy")</td>
-                                       
-                                        <td><a href="/Message/OpenMessage/@item.MessageID/" class="btn btn-warning">Aç</a></td>
+
+                                        <!-- Modal tetikleyen buton -->
+                                        <td>
+                                            <button type="button"
+                                                    class="btn btn-warning btn-open-message"
+                                                    data-id="@item.MessageID">
+                                                Aç
+                                            </button>
+                                        </td>
+
                                         <td><a href="/Message/DeleteMessage/@item.MessageID/" class="btn btn-danger">Sil</a></td>
                                         <td><a href="/Message/UpdateMessage/@item.MessageID/" class="btn btn-info">Güncelle</a></td>
-
                                     </tr>
                                 }
-
-
                             </tbody>
                         </table>
-                        <a href="/Message/CreateMessage/" class="btn btn-success">Yeni Kategori Ekle</a>
 
+                        <a href="/Message/CreateMessage/" class="btn btn-success">Yeni Kategori Ekle</a>
                     </div>
                 </div>
-
-
             </div>
         </div>
     </div>
 </section>
 
+<!-- Mesaj Detay Modal -->
+<div class="modal fade" id="messageDetailModal" tabindex="-1" role="dialog" aria-labelledby="messageDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    Mesaj Detayı
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
 
+            <div class="modal-body">
+                <!-- Yükleniyor -->
+                <div id="msgLoading" class="text-center my-3" style="display:none;">
+                    <div class="spinner-border" role="status"></div>
+                    <div>Yükleniyor…</div>
+                </div>
+
+                <!-- Hata -->
+                <div id="msgError" class="alert alert-danger" style="display:none;"></div>
+
+                <!-- İçerik -->
+                <dl id="msgContent" class="row" style="display:none;">
+                    <dt class="col-sm-3">Gönderici</dt>
+                    <dd class="col-sm-9" id="mSender"></dd>
+
+                    <dt class="col-sm-3">E-Mail</dt>
+                    <dd class="col-sm-9" id="mEmail"></dd>
+
+                    <dt class="col-sm-3">Konu</dt>
+                    <dd class="col-sm-9" id="mSubject"></dd>
+
+                    <dt class="col-sm-3">Tarih</dt>
+                    <dd class="col-sm-9" id="mDate"></dd>
+
+                    <dt class="col-sm-3">Mesaj</dt>
+                    <dd class="col-sm-9" id="mBody" style="white-space:pre-wrap;"></dd>
+                </dl>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts: Layout'a dokunmadan, section kullanmadan -->
+<script>
+    (function(){
+      // API kökü (Controller'da kullandığınızla aynı olmalı)
+      const API_BASE = "https://localhost:44368";
+
+      function formatDate(isoStr){
+        try{
+          const d = new Date(isoStr);
+          return d.toLocaleString('tr-TR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+        }catch(e){ return isoStr; }
+      }
+
+      function showLoader(){
+        document.getElementById('msgLoading').style.display='block';
+        document.getElementById('msgError').style.display='none';
+        document.getElementById('msgContent').style.display='none';
+      }
+
+      function showError(msg){
+        document.getElementById('msgLoading').style.display='none';
+        const err = document.getElementById('msgError');
+        err.textContent = msg || 'Bir hata oluştu.';
+        err.style.display='block';
+      }
+
+         function fillContent(m){
+      // Hem PascalCase hem camelCase için güvenli eşleme
+      const name    = m.MessageNameSurname ?? m.messageNameSurname ?? '';
+      const email   = m.MessageEmail       ?? m.messageEmail       ?? '';
+      const subject = m.MessageSubject     ?? m.messageSubject     ?? '';
+      const dateVal = m.SendDate           ?? m.sendDate           ?? '';
+
+      // İÇERİK: MessageDetail alanını kullan!
+      const body =
+        m.MessageDetail   ?? m.messageDetail ??   // <<-- VERİTABANI/DTO ALANI
+        m.MessageContent  ?? m.messageContent ??
+        m.Content         ?? m.content        ??
+        m.Body            ?? m.body           ?? '';
+
+      document.getElementById('mSender').textContent  = name;
+      document.getElementById('mEmail').textContent   = email;
+      document.getElementById('mSubject').textContent = subject;
+      document.getElementById('mDate').textContent    = dateVal
+        ? (function(d){ try{ return new Date(d).toLocaleString('tr-TR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return d;} })(dateVal)
+        : '';
+      document.getElementById('mBody').textContent = body;
+
+      document.getElementById('msgLoading').style.display='none';
+      document.getElementById('msgError').style.display='none';
+      document.getElementById('msgContent').style.display='flex';
+    }
+
+    async function fetchMessage(id){
+      // ESKİ: const url = `${API_BASE}/api/Messages/GetMessage?id=${encodeURIComponent(id)}`;
+      const url = `/Message/GetMessageJson?id=${encodeURIComponent(id)}`; // same-origin
+      const res = await fetch(url, { method:'GET' });
+      if(!res.ok) throw new Error('Sunucu hatası: ' + res.status);
+      return await res.json();
+    }
+
+
+      // jQuery ve Bootstrap modal yüklü ise bu çalışır
+      document.addEventListener('click', async (e)=>{
+        const btn = e.target.closest('.btn-open-message');
+        if(!btn) return;
+
+        const id = btn.getAttribute('data-id');
+
+        // Modal'ı aç
+        if (window.jQuery && $('#messageDetailModal').modal) {
+          $('#messageDetailModal').modal('show');
+        } else {
+          // jQuery yoksa en azından içeriği dolduralım; modal için bootstrap JS gerekir.
+          console.warn('Bootstrap modal için jQuery/Bootstrap JS gerekli.');
+          document.getElementById('messageDetailModal').style.display = 'block';
+        }
+
+        showLoader();
+
+        try{
+          const data = await fetchMessage(id);
+          // API doğrudan DTO dönüyorsa:
+          fillContent(data);
+          // Eğer { data: {...} } dönüyorsa: fillContent(data.data);
+        }catch(err){
+          console.error(err);
+          showError('Mesaj detayı getirilemedi. Lütfen tekrar deneyin.');
+        }
+      });
+    })();
+</script>

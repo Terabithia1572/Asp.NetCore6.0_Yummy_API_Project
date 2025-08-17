@@ -42,16 +42,16 @@ namespace YummyApi.WebUI.Controllers
         }
         public class OpenAIResponse
         {
-           public List<Choice> choices { get; set; }
+           public List<Choice> choices { get; set; } // OpenAI API'den gelen cevapların listesi
         }
         public class Choice
         {
-            public Message message { get; set; }
+            public Message message { get; set; } // Cevap mesajı
         }
         public class Message
         {
-            public string role { get; set; }
-            public string content { get; set; }
+            public string role { get; set; } // Mesajın rolü (system, user, assistant)
+            public string content { get; set; } // Mesajın içeriği
         }
     }
 }
