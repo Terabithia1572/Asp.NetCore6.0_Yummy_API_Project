@@ -25,6 +25,7 @@
                                     <th scope="col">Mesajı Aç</th>
                                     <th scope="col">Sil</th>
                                     <th scope="col">Güncelle</th>
+                                    <th>AI</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -49,12 +50,13 @@
 
                                         <td><a href="/Message/DeleteMessage/@item.MessageID/" class="btn btn-danger">Sil</a></td>
                                         <td><a href="/Message/UpdateMessage/@item.MessageID/" class="btn btn-info">Güncelle</a></td>
+                                        <td><a href="/Message/AnswerMessageWithOpenAI/@item.MessageID/" class="btn btn-primary">AI</a></td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
 
-                        <a href="/Message/CreateMessage/" class="btn btn-success">Yeni Kategori Ekle</a>
+                        <a href="/Message/CreateMessage/" class="btn btn-success">Yeni Mesaj Ekle</a>
                     </div>
                 </div>
             </div>
