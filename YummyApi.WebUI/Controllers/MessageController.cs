@@ -27,11 +27,18 @@ namespace YummyApi.WebUI.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<MessageController> _logger;
 
-        public MessageController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        // Yerel API endpoint'inizi burada merkezi tanımlayın
+        private const string MessagesApiBase = "https://localhost:7020/api/Messages";
+
+        public MessageController(IHttpClientFactory httpClientFactory,
+                                 IConfiguration configuration,
+                                 ILogger<MessageController> logger)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<IActionResult> MessageList()
@@ -246,7 +253,7 @@ namespace YummyApi.WebUI.Controllers
             var client2 = _httpClientFactory.CreateClient();
             var jsonData = JsonConvert.SerializeObject(createMessageDto);
             StringContent stringContent = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            var responseMessage = await client2.PostAsync("https://localhost:7020/api/Messages", stringContent);
+            var responseMessage = await client2.PostAsync("https://localhost:44368/api/Messages", stringContent);
             if (responseMessage.IsSuccessStatusCode)
             {
                 return RedirectToAction("MessageList");
