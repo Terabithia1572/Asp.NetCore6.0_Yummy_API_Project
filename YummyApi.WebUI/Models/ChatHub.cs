@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace YummyApi.WebUI.Models
 {
@@ -65,9 +67,55 @@ namespace YummyApi.WebUI.Models
             using var responseStream = await response.Content.ReadAsStreamAsync(cancellationToken); // Yanıt akışını alır
             using var reader = new StreamReader(responseStream); // Akışı okuyucuya sarar
 
+            var assistantMessage = new StringBuilder(); // Asistan mesajını oluşturmak için StringBuilder kullanır
+            while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested) // Akış sonuna gelmediyse ve iptal edilmediyse
+            {
+                var line = await reader.ReadLineAsync(); // Bir satır okur
+                if (string.IsNullOrWhiteSpace(line)) continue; // Boş satırsa atla
+                if (!line.StartsWith("data: ")) continue; // "data: " ile başlamıyorsa atla
+                var data = line["data".Length..].Trim(); // "data: " kısmını çıkarır ve kırpar  
+                if (line == "[DONE]") break; // "[DONE]" ise döngüyü kırar
+                try
+                {
+                    var chunk = JsonSerializer.Deserialize<ChatStreamChunk>(data); // JSON'u ayrıştırır
+                    var delta = chunk?.Choices?.FirstOrDefault()?.Delta?.Content; // Delta içeriğini alır
+                    if (!string.IsNullOrEmpty(delta)) // Delta boş değilse
+                    {
+                        assistantMessage.Append(delta); // Delta'yı asistan mesajına ekler
+                        await Clients.Caller.SendAsync("ReceiveToken", delta, cancellationToken); // Kullanıcıya delta'yı gönderir
+                    }
+                }
+                catch  // JSON ayrıştırma hatası varsa
+                {
+                    // Hata durumunda atla ve devam et
+                }
+            }
+            var fullMessage = assistantMessage.ToString(); // Tam asistan mesajını alır
+            history.Add(new Dictionary<string, string> // Asistan mesajını geçmişe ekler
+            {
+                ["role"] = "assistant", // Rolü asistan olarak ayarladık
+                ["content"] = fullMessage // Mesaj içeriği
+            });
+            await Clients.Caller.SendAsync("CompleteMessage", fullMessage, cancellationToken); // Kullanıcıya tam mesajı gönderir
 
 
+        }
+        //Streaming için gerekli sınıflar
+        private sealed class ChatStreamChunk
+        {
+            [JsonPropertyName("choices")] public List<Choice> Choices { get; set; }
 
+        }
+        private sealed class Choice
+        {
+            [JsonPropertyName("delta")] public Delta? Delta { get; set; } // Delta içeriği
+            [JsonPropertyName("finish_reason")] public string? FinishReason { get; set; } // Bitirme nedeni
+
+        }
+        private sealed class Delta
+        {
+            [JsonPropertyName("content")] public string? Content { get; set; } // İçerik
+            [JsonPropertyName("role")] public string? Role { get; set; } // Rol
         }
     }
 }
