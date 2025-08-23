@@ -192,73 +192,73 @@ namespace YummyApi.WebUI.Controllers
         public async Task<IActionResult> SendMessage(CreateMessageDTO createMessageDto)
         {
 
-            var client1 = new HttpClient();
-            var apiKey = _configuration["HuggingFace:ApiKey"] ?? Environment.GetEnvironmentVariable("HUGGINGFACE_API_KEY"); client1.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+            var client1 = new HttpClient(); // HttpClientFactory kullanmadan doğrudan HttpClient örneği oluşturuluyor.
+            var apiKey = _configuration["HuggingFace:ApiKey"] ?? Environment.GetEnvironmentVariable("HUGGINGFACE_API_KEY"); client1.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey); // Hugging Face API anahtarı başlık olarak ekleniyor.
             try
             {
-                var translateRequestBody = new
+                var translateRequestBody = new // Çeviri isteği için istek gövdesi oluşturuluyor.
                 {
-                    inputs = createMessageDto.MessageDetail
+                    inputs = createMessageDto.MessageDetail // Çevrilecek metin
                 };
-                var translateJson = System.Text.Json.JsonSerializer.Serialize(translateRequestBody);
-                var translateContent = new StringContent(translateJson, Encoding.UTF8, "application/json");
+                var translateJson = System.Text.Json.JsonSerializer.Serialize(translateRequestBody); // İstek gövdesi JSON formatına dönüştürülüyor.
+                var translateContent = new StringContent(translateJson, Encoding.UTF8, "application/json"); // JSON içeriği StringContent olarak hazırlanıyor.
 
-                var translateResponse = await client1.PostAsync("https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-tr-en", translateContent);
-                var translateResponseString = await translateResponse.Content.ReadAsStringAsync();
+                var translateResponse = await client1.PostAsync("https://api-inference.huggingface.co/models/Helsinki-NLP/opus-mt-tr-en", translateContent); // Çeviri modeli için POST isteği gönderiliyor.
+                var translateResponseString = await translateResponse.Content.ReadAsStringAsync(); // Yanıt içeriği okunuyor.
 
-                string englishText = createMessageDto.MessageDetail;
-                if (translateResponseString.TrimStart().StartsWith("["))
+                string englishText = createMessageDto.MessageDetail;    // Varsayılan olarak orijinal metin kullanılıyor.
+                if (translateResponseString.TrimStart().StartsWith("[")) // Yanıtın geçerli bir JSON dizisi olup olmadığı kontrol ediliyor.
                 {
-                    var translateDoc = JsonDocument.Parse(translateResponseString);
-                    englishText = translateDoc.RootElement[0].GetProperty("translation_text").GetString();
+                    var translateDoc = JsonDocument.Parse(translateResponseString); // Yanıt JSON olarak ayrıştırılıyor.
+                    englishText = translateDoc.RootElement[0].GetProperty("translation_text").GetString(); // Çevrilmiş metin alınıyor.
                     //ViewBag.v = englishText;
                 }
 
-                var toxicRequestBody = new
+                var toxicRequestBody = new // Toksisite kontrolü için istek gövdesi oluşturuluyor.
                 {
-                    inputs = englishText
+                    inputs = englishText // Toksisite kontrolü yapılacak metin
                 };
 
-                var toxicJson = System.Text.Json.JsonSerializer.Serialize(toxicRequestBody);
-                var toxicContent = new StringContent(toxicJson, Encoding.UTF8, "application/json");
-                var toxicResponse = await client1.PostAsync("https://api-inference.huggingface.co/models/unitary/toxic-bert", toxicContent);
-                var toxicResponseString = await toxicResponse.Content.ReadAsStringAsync();
+                var toxicJson = System.Text.Json.JsonSerializer.Serialize(toxicRequestBody); // İstek gövdesi JSON formatına dönüştürülüyor.
+                var toxicContent = new StringContent(toxicJson, Encoding.UTF8, "application/json"); // JSON içeriği StringContent olarak hazırlanıyor.
+                var toxicResponse = await client1.PostAsync("https://api-inference.huggingface.co/models/unitary/toxic-bert", toxicContent); // Toksisite modeli için POST isteği gönderiliyor.
+                var toxicResponseString = await toxicResponse.Content.ReadAsStringAsync(); // Yanıt içeriği okunuyor. 
 
-                if (toxicResponseString.TrimStart().StartsWith("["))
+                if (toxicResponseString.TrimStart().StartsWith("["))  // Yanıtın geçerli bir JSON dizisi olup olmadığı kontrol ediliyor.
                 {
-                    var toxicDoc = JsonDocument.Parse(toxicResponseString);
-                    foreach (var item in toxicDoc.RootElement[0].EnumerateArray())
+                    var toxicDoc = JsonDocument.Parse(toxicResponseString); // Yanıt JSON olarak ayrıştırılıyor.
+                    foreach (var item in toxicDoc.RootElement[0].EnumerateArray()) // Tüm toksisite etiketleri üzerinde dönülüyor.
                     {
-                        string label = item.GetProperty("label").GetString();
-                        double score = item.GetProperty("score").GetDouble();
+                        string label = item.GetProperty("label").GetString(); // Etiket adı alınıyor.
+                        double score = item.GetProperty("score").GetDouble(); // Etiket skoru alınıyor.
 
                         if (score > 0.5)
                         {
-                            createMessageDto.MessageStatus = "Toksik Mesaj";
+                            createMessageDto.MessageStatus = "Toksik Mesaj"; // Eğer skor 0.5'ten büyükse mesaj toksik olarak işaretleniyor.
                             break;
                         }
                     }
                 }
-                if (string.IsNullOrEmpty(createMessageDto.MessageStatus))
+                if (string.IsNullOrEmpty(createMessageDto.MessageStatus)) // Eğer mesaj durumu henüz belirlenmemişse
                 {
-                    createMessageDto.MessageStatus = "Mesaj Alındı";
+                    createMessageDto.MessageStatus = "Mesaj Alındı"; // Mesaj durumu "Mesaj Alındı" olarak ayarlanıyor.
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) // Herhangi bir hata durumunda
             {
-                createMessageDto.MessageStatus = "Onay Bekliyor";
+                createMessageDto.MessageStatus = "Onay Bekliyor";  // Hata durumunda mesaj durumu "Onay Bekliyor" olarak ayarlanıyor.
             }
 
 
-            var client2 = _httpClientFactory.CreateClient();
-            var jsonData = JsonConvert.SerializeObject(createMessageDto);
-            StringContent stringContent = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            var responseMessage = await client2.PostAsync("https://localhost:44368/api/Messages", stringContent);
-            if (responseMessage.IsSuccessStatusCode)
+            var client2 = _httpClientFactory.CreateClient(); // HttpClientFactory kullanılarak yeni bir HttpClient örneği oluşturuluyor.
+            var jsonData = JsonConvert.SerializeObject(createMessageDto); // createMessageDto nesnesi JSON formatına dönüştürülüyor.
+            StringContent stringContent = new StringContent(jsonData, Encoding.UTF8, "application/json"); // JSON içeriği StringContent olarak hazırlanıyor.
+            var responseMessage = await client2.PostAsync("https://localhost:44368/api/Messages", stringContent); // Mesaj oluşturma API'sine POST isteği gönderiliyor.
+            if (responseMessage.IsSuccessStatusCode) // Eğer yanıt başarılıysa
             {
-                return RedirectToAction("MessageList");
+                return RedirectToAction("MessageList"); // Mesaj listesini görüntülemek için MessageList eylemine yönlendiriliyor.
             }
-            return View();
+            return View(); // Eğer yanıt başarısızsa, aynı görünüm tekrar gösteriliyor.
         }
     }
 
