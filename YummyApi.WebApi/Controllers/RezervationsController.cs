@@ -68,5 +68,29 @@ namespace YummyApi.WebApi.Controllers
             _context.SaveChanges();
             return Ok("Rezervasyon Güncelleme İşlemi Başarılı.."); //200 kodu döner Rezervasyon güncelleme işlemi başarılı
         }
+        [HttpGet("GetTotalReservationCount")]
+        public IActionResult GetTotalReservationCount()
+        {
+            var totalReservations = _context.Reservations.Count();
+            return Ok(totalReservations); //200 kodu döner ve toplam rezervasyon sayısını getirir
+        }
+        [HttpGet("GetTotalCustomerCount")]
+        public IActionResult GetTotalCustomerCount()
+        {
+            var totalCustomer = _context.Reservations.Sum(x=>x.CountOfPeople);
+            return Ok(totalCustomer); //200 kodu döner ve toplam rezervasyon sayısını getirir
+        }
+        [HttpGet("GetPendingReservation")]
+        public IActionResult GetPendingReservation()
+        {
+            var totalCustomer = _context.Reservations.Where(x => x.ReservationStatus=="Onay Bekliyor").Count();
+            return Ok(totalCustomer); //200 kodu döner ve toplam rezervasyon sayısını getirir
+        }
+        [HttpGet("GetApprovedReservation")]
+        public IActionResult GetApprovedReservation()
+        {
+            var totalCustomer = _context.Reservations.Where(x => x.ReservationStatus == "Onaylandı").Count();
+            return Ok(totalCustomer); //200 kodu döner ve toplam rezervasyon sayısını getirir
+        }
     }
 }
