@@ -102,16 +102,16 @@ namespace YummyApi.WebApi.Controllers
             var rawData = _context.Reservations // DbSet'inden başla
                 .Where(r => r.ReservationDate >= fourMonthsAgo) // Son 3 ayın verisi
                 .GroupBy(r => new { r.ReservationDate.Year, r.ReservationDate.Month }) // Yıl ve aya göre grupla
-                .Select(g => new // Geçici anonim tip
+                .Select(g => new // Grup içindeki verilere göre yeni bir anonim nesne oluştur
                 {
-                    g.Key.Year,
-                    g.Key.Month,
+                    g.Key.Year, // Yıl
+                    g.Key.Month, // Ay
                     Approved = g.Count(x => x.ReservationStatus == "Onaylandı"), // Duruma göre say
                     Pending = g.Count(x => x.ReservationStatus == "Onay Bekliyor"), // Duruma göre say
                     Canceled = g.Count(x => x.ReservationStatus == "İptal Edildi") // Duruma göre say
                 })
                 .OrderBy(x => x.Year).ThenBy(x => x.Month) // Yıla ve aya göre sırala
-                .ToList(); // Burada SQL biter, veriler RAM’e alınır
+                .ToList(); // Burala kadar SQL tarafında çalışır ve veriyi belleğe alır ve bir liste oluşturur
 
             // 2. Bellekte DTO'ya mapleme + tarih formatlama 
             var result = rawData.Select(x => new ReservationChartDTO // DTO'ya mapleme
