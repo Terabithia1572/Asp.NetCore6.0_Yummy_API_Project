@@ -92,5 +92,38 @@ namespace YummyApi.WebApi.Controllers
             var totalCustomer = _context.Reservations.Where(x => x.ReservationStatus == "Onaylandı").Count();
             return Ok(totalCustomer); //200 kodu döner ve toplam rezervasyon sayısını getirir
         }
+        [HttpGet("GetReservationStats")]
+        public IActionResult GetReservationStats()
+        {
+            DateTime today = DateTime.Today; // Bugünün tarihi
+            DateTime fourMonthsAgo = today.AddMonths(-3); // 3 ay öncesinin tarihi
+
+            // 1. SQL tarafında sadece gruplama ve veri çekme
+            var rawData = _context.Reservations // DbSet'inden başla
+                .Where(r => r.ReservationDate >= fourMonthsAgo) // Son 3 ayın verisi
+                .GroupBy(r => new { r.ReservationDate.Year, r.ReservationDate.Month }) // Yıl ve aya göre grupla
+                .Select(g => new // Geçici anonim tip
+                {
+                    g.Key.Year,
+                    g.Key.Month,
+                    Approved = g.Count(x => x.ReservationStatus == "Onaylandı"), // Duruma göre say
+                    Pending = g.Count(x => x.ReservationStatus == "Onay Bekliyor"), // Duruma göre say
+                    Canceled = g.Count(x => x.ReservationStatus == "İptal Edildi") // Duruma göre say
+                })
+                .OrderBy(x => x.Year).ThenBy(x => x.Month) // Yıla ve aya göre sırala
+                .ToList(); // Burada SQL biter, veriler RAM’e alınır
+
+            // 2. Bellekte DTO'ya mapleme + tarih formatlama 
+            var result = rawData.Select(x => new ReservationChartDTO // DTO'ya mapleme
+            {
+                Month = new DateTime(x.Year, x.Month, 1).ToString("MMM yyyy"), // Ay adını ve yılı al
+                Approved = x.Approved, // Durum sayıları    
+                Pending = x.Pending, // Durum sayıları 
+                Canceled = x.Canceled // Durum sayıları
+            }).ToList();
+
+            return Ok(result);
+        }
+
     }
 }
