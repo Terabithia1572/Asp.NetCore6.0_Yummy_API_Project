@@ -1,16 +1,20 @@
-﻿namespace YummyApi.WebApi.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace YummyApi.WebApi.Entities
 {
     public class EmployeeTask
     {
-        public int EmployeeTaskID { get; set; } // Görev ID
+        [Key]
+        public int EmployeeTaskId { get; set; } // Birincil Anahtar
         public string TaskName { get; set; } // Görev Adı
-        public byte TaskStatusValue { get; set; } // Görev Durumu (0: Beklemede, 1: Devam Ediyor, 2: Tamamlandı)
+        public byte TaskStatusValue { get; set; } // Görev Durumu (0: Atanmadı, 1: Atandı, 2: Tamamlandı)
         public DateTime AssignDate { get; set; } // Atanma Tarihi
         public DateTime DueDate { get; set; } // Bitiş Tarihi
         public string Priority { get; set; } // Öncelik (Düşük, Orta, Yüksek)
-        public string TaskStatus { get; set; } // Görev Durumu (Beklemede, Devam Ediyor, Tamamlandı)
-        public int ChefID { get; set; } // Şef ID (Yabancı Anahtar)
-        public Chef Chef { get; set; } // İlişkili Şef
+        public string TaskStatus { get; set; } // Görev Durumu (Atanmadı, Atandı, Tamamlandı)
+
+        // İlişkiler çoka çok ilişki
+        public List<EmployeeTaskChef?> EmployeeTaskChefs { get; set; }
 
 
     }

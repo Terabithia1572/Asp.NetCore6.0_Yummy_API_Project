@@ -23,7 +23,7 @@ namespace YummyApi.WebApi.Context
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<About> Abouts { get; set; }
         public DbSet<EmployeeTask> EmployeeTasks { get; set; }
-        
+        public DbSet<EmployeeTaskChef> EmployeeTaskChefs { get; set; } // İlişkiler çoka çok ilişki tablosu 
 
 
     }
