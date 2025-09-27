@@ -7,5 +7,6 @@
         public string ChefTitle { get; set; } //Şef Başlık
         public string ChefDescription { get; set; } //Şef Açıklama
         public string ChefImageURL { get; set; } //Şef Resmi URL
+        public List<EmployeeTask> EmployeeTasks { get; set; } //Şefin Görevleri
     }
 }
