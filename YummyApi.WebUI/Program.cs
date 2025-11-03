@@ -28,6 +28,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.MapHub<ChatHub>("/chatHub"); // ChatHub'ý "/chatHub" yoluna eþledik
+//app.MapHub<ChatHub>("/chatHub"); // ChatHub'ý "/chatHub" yoluna eþledik
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
