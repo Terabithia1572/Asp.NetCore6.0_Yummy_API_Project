@@ -45,7 +45,8 @@
             </div>
         </div>
     </div>
-    @await Component.InvokeAsync("_DashboardEmployeeTaskComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan Employee Task verilerini tutuyor-->
+    @* @await Component.InvokeAsync("_DashboardEmployeeTaskComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan Employee Task verilerini tutuyor--> *@
+    @await Component.InvokeAsync("_DashboardGroupReservationComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan Employee Task verilerini tutuyor-->
 
    
     <div class="row">
