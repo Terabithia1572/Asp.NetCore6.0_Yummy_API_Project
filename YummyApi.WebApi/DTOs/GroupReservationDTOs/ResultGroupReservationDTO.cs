@@ -1,4 +1,4 @@
-﻿namespace YummyApi.WebUI.DTOs.GroupReservationDTOs
+﻿namespace YummyApi.WebApi.DTOs.GroupReservationDTOs
 {
     public class ResultGroupReservationDTO
     {

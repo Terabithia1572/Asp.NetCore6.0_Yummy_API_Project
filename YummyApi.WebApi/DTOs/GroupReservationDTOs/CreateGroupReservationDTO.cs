@@ -1,8 +1,7 @@
-﻿namespace YummyApi.WebUI.DTOs.GroupReservationDTOs
+﻿namespace YummyApi.WebApi.DTOs.GroupReservationDTOs
 {
-    public class ResultGroupReservationDTO
+    public class CreateGroupReservationDTO
     {
-        public int GroupReservationID { get; set; } // Grup rezervasyonunun benzersiz kimliği
         public string ResponsibleCustomerName { get; set; } // Sorumlu müşteri adı
         public string GroupReservationTitle { get; set; } // Grup rezervasyon başlığı
         public DateTime GroupReservationDate { get; set; } // Grup rezervasyon tarihi
