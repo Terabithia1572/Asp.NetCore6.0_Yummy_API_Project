@@ -10,5 +10,7 @@
         public string GroupReservationPriority { get; set; } // Grup rezervasyon önceliği
         public string GroupReservationDetails { get; set; } // Grup rezervasyon detayları
         public string GroupReservationStatus { get; set; } // Grup rezervasyon durumu
+        public int? GroupReservationPersonCount { get; set; } // Grup rezervasyondaki kişi sayısı
+        public string? GroupReservationEmail { get; set; } // Grup rezervasyonundaki email bilgisi
     }
 }

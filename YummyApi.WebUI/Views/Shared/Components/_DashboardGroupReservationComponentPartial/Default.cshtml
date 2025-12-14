@@ -1,4 +1,5 @@
 ﻿@model List<ResultGroupReservationDTO>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -15,6 +16,7 @@
                     </form>
                 </div>
             </div>
+
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-striped">
@@ -28,42 +30,85 @@
                             </th>
                             <th>Grup Başlığı</th>
                             <th>Yetkili Kişi</th>
+                            <th>Kişi Sayısı</th>
                             <th>Rezervasyon Durumu</th>
                             <th>Talep Tarihi</th>
                             <th>Rezervasyon Tarihi</th>
                             <th>Öncelik</th>
                             <th>Detaylar</th>
-                           
                         </tr>
-
 
                         @foreach (var item in Model)
                         {
+                            // -------- PRIORITY (badge) --------
+                            var priority = (item.GroupReservationPriority ?? "").Trim().ToLower();
+                            var priorityBadgeClass = priority switch
+                            {
+                                "düşük" => "badge-success",
+                                "dusuk" => "badge-success",
+                                "orta" => "badge-warning",
+                                "yüksek" => "badge-danger",
+                                "yuksek" => "badge-danger",
+                                _ => "badge-secondary"
+                            };
+
+                            // -------- STATUS (progress) --------
+                            var status = (item.GroupReservationStatus ?? "").Trim().ToLower();
+
+                            // Status’a göre yüzde ve renk
+                            var statusPercent = status switch
+                            {
+                                "onaylandı" => 100,
+                                "onaylandi" => 100,
+                                "beklemede" => 60,
+                                "iptal edildi" => 20,
+                                "iptal" => 20,
+                                _ => 40
+                            };
+
+                            var statusBarClass = status switch
+                            {
+                                "onaylandı" => "bg-success",
+                                "onaylandi" => "bg-success",
+                                "beklemede" => "bg-warning",
+                                "iptal edildi" => "bg-danger",
+                                "iptal" => "bg-danger",
+                                _ => "bg-info"
+                            };
+
                             <tr>
                                 <td class="p-0 text-center">
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
-                                               id="checkbox-1">
-                                        <label for="checkbox-1" class="custom-control-label">&nbsp;</label>
+                                               id="checkbox-@item.GroupReservationID">
+                                        <label for="checkbox-@item.GroupReservationID" class="custom-control-label">&nbsp;</label>
                                     </div>
                                 </td>
+
                                 <td>@item.GroupReservationTitle</td>
                                 <td>@item.ResponsibleCustomerName</td>
+                                <td>@item.GroupReservationPersonCount</td>
                                 <td class="align-middle">
-                                    <div class="progress-text">@item.GroupReservationStatus%</div>
+                                    <div class="progress-text">
+                                        @item.GroupReservationStatus
+                                        <span class="ml-2 text-muted">(@statusPercent%)</span>
+                                    </div>
                                     <div class="progress" data-height="6">
-                                        <div class="progress-bar bg-success" data-width="@item.GroupReservationStatus%"></div>
+                                        <div class="progress-bar @statusBarClass" data-width="@statusPercent%"></div>
                                     </div>
                                 </td>
+                                
+
                                 <td>@item.GroupReservationLastProcessDate.ToString("dd MMM yyyy")</td>
                                 <td>@item.GroupReservationDate.ToString("dd MMM yyyy")</td>
+
                                 <td>
-                                    <div class="badge badge-success">@item.GroupReservationPriority</div>
+                                    <div class="badge @priorityBadgeClass">@item.GroupReservationPriority</div>
                                 </td>
+
                                 <td><a href="#" class="btn btn-outline-primary">Detaylar</a></td>
                             </tr>
                         }
-
                     </table>
                 </div>
             </div>
