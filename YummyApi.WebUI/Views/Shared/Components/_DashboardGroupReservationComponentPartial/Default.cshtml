@@ -1,117 +1,159 @@
 ﻿@model List<ResultGroupReservationDTO>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h4>Grup Rezervasyonları</h4>
-                <div class="card-header-form">
-                    <form>
-                        <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Aranacak Rezervasyonlar">
-                            <div class="input-group-btn">
-                                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white py-3">
+        <h4 class="fw-bold mb-0">Grup Rezervasyonları</h4>
 
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <tr>
-                            <th class="text-center">
-                                <div class="custom-checkbox custom-checkbox-table custom-control">
-                                    <input type="checkbox" data-checkboxes="mygroup" data-checkbox-role="dad"
-                                           class="custom-control-input" id="checkbox-all">
-                                    <label for="checkbox-all" class="custom-control-label">&nbsp;</label>
-                                </div>
-                            </th>
-                            <th>Grup Başlığı</th>
-                            <th>Yetkili Kişi</th>
-                            <th>Kişi Sayısı</th>
-                            <th>Rezervasyon Durumu</th>
-                            <th>Talep Tarihi</th>
-                            <th>Rezervasyon Tarihi</th>
-                            <th>Öncelik</th>
-                            <th>Detaylar</th>
-                        </tr>
+        <div class="input-group" style="width:260px;">
+            <input type="text"
+                   class="form-control rounded-pill"
+                   placeholder="Rezervasyon ara..."
+                   style="height:38px; padding-left:16px; padding-right:42px;">
 
-                        @foreach (var item in Model)
+            <span class="input-group-text bg-transparent border-0"
+                  style="position:absolute; right:10px; top:50%; transform:translateY(-50%); z-index:5;">
+                <i class="fas fa-search text-muted"></i>
+            </span>
+        </div>
+
+
+
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table align-middle table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th style="width:35px;"></th>
+                        <th>Grup Başlığı</th>
+                        <th>Yetkili Kişi</th>
+                        <th>Email</th>
+                        <th>Durum</th>
+                        <th>Kişi</th>
+                        <th>Son İşlem</th>
+                        <th>Rezervasyon</th>
+                        <th>Öncelik</th>
+                        <th style="width:120px;"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        // ----- STATUS badge + icon (TR/EN uyumlu) -----
+                        var status = (item.GroupReservationStatus ?? "").Trim().ToLower();
+
+                        string statusClass = status switch
                         {
-                            // -------- PRIORITY (badge) --------
-                            var priority = (item.GroupReservationPriority ?? "").Trim().ToLower();
-                            var priorityBadgeClass = priority switch
-                            {
-                                "düşük" => "badge-success",
-                                "dusuk" => "badge-success",
-                                "orta" => "badge-warning",
-                                "yüksek" => "badge-danger",
-                                "yuksek" => "badge-danger",
-                                _ => "badge-secondary"
-                            };
+                            "onaylandı" or "onaylandi" or "approved" => "badge-success",
+                            "beklemede" or "pending" => "badge-warning",
+                            "iptal edildi" or "iptal" or "cancelled" => "badge-danger",
+                            _ => "badge-secondary"
+                        };
 
-                            // -------- STATUS (progress) --------
-                            var status = (item.GroupReservationStatus ?? "").Trim().ToLower();
+                        string statusIcon = status switch
+                        {
+                            "onaylandı" or "onaylandi" or "approved" => "fas fa-check-circle",
+                            "beklemede" or "pending" => "fas fa-hourglass-half",
+                            "iptal edildi" or "iptal" or "cancelled" => "fas fa-times-circle",
+                            _ => "fas fa-info-circle"
+                        };
 
-                            // Status’a göre yüzde ve renk
-                            var statusPercent = status switch
-                            {
-                                "onaylandı" => 100,
-                                "onaylandi" => 100,
-                                "beklemede" => 60,
-                                "iptal edildi" => 20,
-                                "iptal" => 20,
-                                _ => 40
-                            };
+                        // ----- PRIORITY icon + (istersen renkli badge de yaparız) -----
+                        var priority = (item.GroupReservationPriority ?? "").Trim().ToLower();
 
-                            var statusBarClass = status switch
-                            {
-                                "onaylandı" => "bg-success",
-                                "onaylandi" => "bg-success",
-                                "beklemede" => "bg-warning",
-                                "iptal edildi" => "bg-danger",
-                                "iptal" => "bg-danger",
-                                _ => "bg-info"
-                            };
+                        string priorityIcon = priority switch
+                        {
+                            "yüksek" or "yuksek" => "fas fa-exclamation-circle text-danger",
+                            "orta" => "fas fa-chevron-up text-warning",
+                            "düşük" or "dusuk" => "fas fa-minus-circle text-success",
+                            _ => "fas fa-circle text-muted"
+                        };
 
-                            <tr>
-                                <td class="p-0 text-center">
-                                    <div class="custom-checkbox custom-control">
-                                        <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
-                                               id="checkbox-@item.GroupReservationID">
-                                        <label for="checkbox-@item.GroupReservationID" class="custom-control-label">&nbsp;</label>
-                                    </div>
-                                </td>
+                        <tr class="table-row-modern">
 
-                                <td>@item.GroupReservationTitle</td>
-                                <td>@item.ResponsibleCustomerName</td>
-                                <td>@item.GroupReservationPersonCount</td>
-                                <td class="align-middle">
-                                    <div class="progress-text">
-                                        @item.GroupReservationStatus
-                                        <span class="ml-2 text-muted">(@statusPercent%)</span>
-                                    </div>
-                                    <div class="progress" data-height="6">
-                                        <div class="progress-bar @statusBarClass" data-width="@statusPercent%"></div>
-                                    </div>
-                                </td>
-                                
+                            <!-- Checkbox -->
+                            <td>
+                                <input type="checkbox" />
+                            </td>
 
-                                <td>@item.GroupReservationLastProcessDate.ToString("dd MMM yyyy")</td>
-                                <td>@item.GroupReservationDate.ToString("dd MMM yyyy")</td>
+                            <!-- Group Title -->
+                            <td class="fw-semibold">
+                                <i class="fas fa-users text-primary me-2"></i>
+                                @item.GroupReservationTitle
+                            </td>
 
-                                <td>
-                                    <div class="badge @priorityBadgeClass">@item.GroupReservationPriority</div>
-                                </td>
+                            <!-- Responsible Person -->
+                            <td>
+                                <i class="fas fa-user text-secondary me-2"></i>
+                                @item.ResponsibleCustomerName
+                            </td>
 
-                                <td><a href="#" class="btn btn-outline-primary">Detaylar</a></td>
-                            </tr>
-                        }
-                    </table>
-                </div>
-            </div>
+                            <!-- Email -->
+                            <td>
+                                <i class="fas fa-envelope text-muted me-2"></i>
+                                @item.GroupReservationEmail
+                            </td>
+
+                            <!-- Status -->
+                            <td>
+                                <span class="badge @statusClass px-3 py-2 rounded-pill">
+                                    <i class="@statusIcon me-1"></i>
+                                    @item.GroupReservationStatus
+                                </span>
+                            </td>
+
+                            <!-- Person Count -->
+                            <td>
+                                <i class="fas fa-user-friends text-info me-2"></i>
+                                @item.GroupReservationPersonCount
+                            </td>
+
+                            <!-- Last Process Date -->
+                            <td>
+                                <i class="fas fa-calendar-alt text-warning me-2"></i>
+                                @item.GroupReservationLastProcessDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <!-- Reservation Date -->
+                            <td>
+                                <i class="fas fa-calendar-check text-success me-2"></i>
+                                @item.GroupReservationDate.ToString("dd-MMM-yyyy")
+                            </td>
+
+                            <!-- Priority -->
+                            <td>
+                                <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
+                                    <i class="@priorityIcon me-1"></i>
+                                    @item.GroupReservationPriority
+                                </span>
+                            </td>
+
+                            <!-- Details Button -->
+                            <td class="text-end">
+                                <a href="#"
+                                   class="btn btn-outline-primary btn-sm rounded-pill px-2 py-1"
+                                   style="font-size: 12px;">
+                                    <i class="fas fa-info-circle me-1"></i> Detaylar
+                                </a>
+
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
+
+<style>
+    .table-row-modern:hover {
+        background-color: #f8f9fa !important;
+        transition: 0.2s ease-in-out;
+    }
+
+    .rounded-4 {
+        border-radius: 1rem !important;
+    }
+</style>
