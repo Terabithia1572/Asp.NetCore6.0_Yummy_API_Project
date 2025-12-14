@@ -4,25 +4,21 @@
     <div class="card-header d-flex justify-content-between align-items-center bg-white py-3">
         <h4 class="fw-bold mb-0">Grup Rezervasyonları</h4>
 
-        <div class="input-group" style="width:260px;">
-            <input type="text"
+        <div class="input-group" style="width:260px; position:relative;">
+            <input id="reservationSearchInput" type="text"
                    class="form-control rounded-pill"
                    placeholder="Rezervasyon ara..."
                    style="height:38px; padding-left:16px; padding-right:42px;">
-
             <span class="input-group-text bg-transparent border-0"
-                  style="position:absolute; right:10px; top:50%; transform:translateY(-50%); z-index:5;">
+                  style="position:absolute; right:10px; top:50%; transform:translateY(-50%); z-index:5; pointer-events:none;">
                 <i class="fas fa-search text-muted"></i>
             </span>
         </div>
-
-
-
     </div>
 
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table align-middle table-hover mb-0">
+            <table id="reservationTable" class="table align-middle table-hover mb-0">
                 <thead class="bg-light">
                     <tr>
                         <th style="width:35px;"></th>
@@ -39,9 +35,8 @@
                 </thead>
 
                 <tbody>
-                    @foreach (var item in Model)
+                    @foreach (var item in Model ?? new List<ResultGroupReservationDTO>())
                     {
-                        // ----- STATUS badge + icon (TR/EN uyumlu) -----
                         var status = (item.GroupReservationStatus ?? "").Trim().ToLower();
 
                         string statusClass = status switch
@@ -60,7 +55,6 @@
                             _ => "fas fa-info-circle"
                         };
 
-                        // ----- PRIORITY icon + (istersen renkli badge de yaparız) -----
                         var priority = (item.GroupReservationPriority ?? "").Trim().ToLower();
 
                         string priorityIcon = priority switch
@@ -71,32 +65,26 @@
                             _ => "fas fa-circle text-muted"
                         };
 
-                        <tr class="table-row-modern">
+                        <tr class="table-row-modern"
+                            data-search="@($"{item.GroupReservationTitle} {item.ResponsibleCustomerName} {item.GroupReservationEmail} {item.GroupReservationStatus} {item.GroupReservationPriority}".ToLower())">
 
-                            <!-- Checkbox -->
-                            <td>
-                                <input type="checkbox" />
-                            </td>
+                            <td><input type="checkbox" /></td>
 
-                            <!-- Group Title -->
                             <td class="fw-semibold">
                                 <i class="fas fa-users text-primary me-2"></i>
                                 @item.GroupReservationTitle
                             </td>
 
-                            <!-- Responsible Person -->
                             <td>
                                 <i class="fas fa-user text-secondary me-2"></i>
                                 @item.ResponsibleCustomerName
                             </td>
 
-                            <!-- Email -->
                             <td>
                                 <i class="fas fa-envelope text-muted me-2"></i>
                                 @item.GroupReservationEmail
                             </td>
 
-                            <!-- Status -->
                             <td>
                                 <span class="badge @statusClass px-3 py-2 rounded-pill">
                                     <i class="@statusIcon me-1"></i>
@@ -104,25 +92,21 @@
                                 </span>
                             </td>
 
-                            <!-- Person Count -->
                             <td>
                                 <i class="fas fa-user-friends text-info me-2"></i>
                                 @item.GroupReservationPersonCount
                             </td>
 
-                            <!-- Last Process Date -->
                             <td>
                                 <i class="fas fa-calendar-alt text-warning me-2"></i>
                                 @item.GroupReservationLastProcessDate.ToString("dd-MMM-yyyy")
                             </td>
 
-                            <!-- Reservation Date -->
                             <td>
                                 <i class="fas fa-calendar-check text-success me-2"></i>
                                 @item.GroupReservationDate.ToString("dd-MMM-yyyy")
                             </td>
 
-                            <!-- Priority -->
                             <td>
                                 <span class="badge bg-light text-dark px-3 py-2 rounded-pill">
                                     <i class="@priorityIcon me-1"></i>
@@ -130,14 +114,24 @@
                                 </span>
                             </td>
 
-                            <!-- Details Button -->
                             <td class="text-end">
-                                <a href="#"
-                                   class="btn btn-outline-primary btn-sm rounded-pill px-2 py-1"
-                                   style="font-size: 12px;">
+                                <button type="button"
+                                        class="btn btn-outline-primary btn-sm rounded-pill px-2 py-1 detail-btn"
+                                        style="font-size:12px;"
+                                        data-title="@item.GroupReservationTitle"
+                                        data-responsible="@item.ResponsibleCustomerName"
+                                        data-email="@item.GroupReservationEmail"
+                                        data-status="@item.GroupReservationStatus"
+                                        data-person-count="@item.GroupReservationPersonCount"
+                                        data-reservation-date="@item.GroupReservationDate.ToString("dd MMM yyyy")"
+                                        data-last-process="@item.GroupReservationLastProcessDate.ToString("dd MMM yyyy")"
+                                        data-priority="@item.GroupReservationPriority"
+                                        data-details="@item.GroupReservationDetails"
+                                        data-status-class="@statusClass"
+                                        data-status-icon="@statusIcon"
+                                        data-priority-icon="@priorityIcon">
                                     <i class="fas fa-info-circle me-1"></i> Detaylar
-                                </a>
-
+                                </button>
                             </td>
                         </tr>
                     }
@@ -147,13 +141,276 @@
     </div>
 </div>
 
+<!-- DETAY MODAL -->
+<div class="modal fade" id="reservationDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg rounded-4" style="background:#fff;">
+            <div class="modal-header border-0 bg-gradient-primary text-white rounded-top-4 py-4">
+                <div>
+                    <h5 class="modal-title fw-bold mb-1">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span id="modal-title">Rezervasyon Detayları</span>
+                    </h5>
+                    <small class="opacity-75">Grup rezervasyon bilgileri</small>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="detail-card p-3 rounded-3 bg-light h-100">
+                            <h6 class="text-primary fw-bold mb-3"><i class="fas fa-user-circle me-2"></i>Yetkili Bilgileri</h6>
+
+                            <label class="text-muted small mb-1">Yetkili Kişi</label>
+                            <p class="mb-3 fw-semibold" id="modal-responsible"><span></span></p>
+
+                            <label class="text-muted small mb-1">E-posta</label>
+                            <p class="mb-0" id="modal-email"><span></span></p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="detail-card p-3 rounded-3 bg-light h-100">
+                            <h6 class="text-success fw-bold mb-3"><i class="fas fa-calendar-check me-2"></i>Rezervasyon Bilgileri</h6>
+
+                            <label class="text-muted small mb-1">Kişi Sayısı</label>
+                            <p class="mb-3 fw-semibold" id="modal-person-count"><span></span></p>
+
+                            <label class="text-muted small mb-1">Rezervasyon Tarihi</label>
+                            <p class="mb-0" id="modal-reservation-date"><span></span></p>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="detail-card p-3 rounded-3 bg-light">
+                                    <label class="text-muted small mb-2">Durum</label>
+                                    <div id="modal-status"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="detail-card p-3 rounded-3 bg-light">
+                                    <label class="text-muted small mb-2">Öncelik</label>
+                                    <div id="modal-priority"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="detail-card p-3 rounded-3 bg-light">
+                            <label class="text-muted small mb-1">Son İşlem Tarihi</label>
+                            <p class="mb-0" id="modal-last-process"><span></span></p>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="detail-card p-3 rounded-3 bg-light">
+                            <label class="text-muted small mb-2"><i class="fas fa-file-alt me-2"></i>Detaylı Açıklama</label>
+                            <p class="mb-0 text-justify" id="modal-details"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 bg-light rounded-bottom-4">
+                <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Kapat
+                </button>
+
+                <button type="button" id="dummyEditBtn" class="btn btn-primary rounded-pill px-4">
+                    <i class="fas fa-edit me-2"></i>Düzenle
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
     .table-row-modern:hover {
         background-color: #f8f9fa !important;
-        transition: 0.2s ease-in-out;
+        transition: .2s ease-in-out;
     }
 
     .rounded-4 {
         border-radius: 1rem !important;
     }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+    }
+
+    .detail-card {
+        transition: all .2s ease;
+    }
+
+        .detail-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,.08);
+        }
+
+    .text-justify {
+        text-align: justify;
+        line-height: 1.6;
+    }
+
+    /* ✅ EN KRİTİK FIX: Otika katmanlarının üstüne çık */
+    #reservationDetailModal {
+        z-index: 30000 !important;
+    }
+
+    .modal-backdrop {
+        z-index: 29990 !important;
+    }
+
+    /* ✅ Modal açıkken Otika overlay/katmanları tıklamayı yemesin */
+    body.modal-otika-fix .loader,
+    body.modal-otika-fix .main-wrapper,
+    body.modal-otika-fix .right-sidebar,
+    body.modal-otika-fix .settingSidebar,
+    body.modal-otika-fix .settingSidebar-body,
+    body.modal-otika-fix .overlay,
+    body.modal-otika-fix .sidebar-wrapper {
+        pointer-events: none !important;
+    }
+
+    /* ✅ Modal içi tıklamalar kesin çalışsın */
+    #reservationDetailModal .modal-content,
+    #reservationDetailModal .modal-header,
+    #reservationDetailModal .modal-body,
+    #reservationDetailModal .modal-footer,
+    #reservationDetailModal button,
+    #reservationDetailModal a {
+        pointer-events: auto !important;
+        position: relative;
+        z-index: 30010 !important;
+    }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        // -------- SEARCH --------
+        const searchInput = document.getElementById('reservationSearchInput');
+        const rows = Array.from(document.querySelectorAll('#reservationTable tbody tr'));
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const q = (this.value || '').trim().toLowerCase();
+                rows.forEach(r => {
+                    const hay = (r.getAttribute('data-search') || '');
+                    r.style.display = hay.includes(q) ? '' : 'none';
+                });
+            });
+        }
+
+        // -------- MODAL HELPERS (Bootstrap 4/5 uyumlu) --------
+        const modalEl = document.getElementById('reservationDetailModal');
+
+        function addOtikaFix() { document.body.classList.add('modal-otika-fix'); }
+        function removeOtikaFix() { document.body.classList.remove('modal-otika-fix'); }
+
+        function showModal() {
+            addOtikaFix();
+
+            // Bootstrap 5 varsa:
+            if (window.bootstrap && bootstrap.Modal) {
+                // getOrCreateInstance BS5.2+ var, yoksa new bootstrap.Modal ile aç
+                if (typeof bootstrap.Modal.getOrCreateInstance === "function") {
+                    bootstrap.Modal.getOrCreateInstance(modalEl, { backdrop: true, keyboard: true }).show();
+                } else {
+                    new bootstrap.Modal(modalEl, { backdrop: true, keyboard: true }).show();
+                }
+                return;
+            }
+
+            // Bootstrap 4 (jQuery) varsa:
+            if (window.jQuery && typeof window.jQuery(modalEl).modal === "function") {
+                window.jQuery(modalEl).modal({ backdrop: true, keyboard: true, show: true });
+                return;
+            }
+
+            console.error("Bootstrap modal bulunamadı. app.min.js içinde bootstrap yok gibi.");
+        }
+
+        function hideModal() {
+            // BS5
+            if (window.bootstrap && bootstrap.Modal) {
+                const inst = bootstrap.Modal.getInstance(modalEl);
+                if (inst) inst.hide();
+            }
+            // BS4
+            if (window.jQuery && typeof window.jQuery(modalEl).modal === "function") {
+                window.jQuery(modalEl).modal('hide');
+            }
+            removeOtikaFix();
+        }
+
+        // Modal kapanınca fix class kalksın (BS5 event)
+        modalEl.addEventListener('hidden.bs.modal', removeOtikaFix);
+        modalEl.addEventListener('shown.bs.modal', addOtikaFix);
+
+        // -------- DETAIL BUTTON --------
+        document.querySelectorAll('.detail-btn').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const title = this.getAttribute('data-title') || 'Rezervasyon Detayları';
+                const responsible = this.getAttribute('data-responsible') || '-';
+                const email = this.getAttribute('data-email') || 'Belirtilmemiş';
+                const status = this.getAttribute('data-status') || '-';
+                const personCount = this.getAttribute('data-person-count') || '0';
+                const reservationDate = this.getAttribute('data-reservation-date') || '-';
+                const lastProcess = this.getAttribute('data-last-process') || '-';
+                const priority = this.getAttribute('data-priority') || '-';
+                const details = this.getAttribute('data-details') || 'Detay bilgisi bulunmamaktadır.';
+                const statusClass = this.getAttribute('data-status-class') || 'badge-secondary';
+                const statusIcon = this.getAttribute('data-status-icon') || 'fas fa-info-circle';
+                const priorityIcon = this.getAttribute('data-priority-icon') || 'fas fa-circle text-muted';
+
+                document.getElementById('modal-title').textContent = title;
+                document.querySelector('#modal-responsible span').textContent = responsible;
+                document.querySelector('#modal-email span').textContent = email;
+                document.querySelector('#modal-person-count span').textContent = personCount + ' Kişi';
+                document.querySelector('#modal-reservation-date span').textContent = reservationDate;
+                document.querySelector('#modal-last-process span').textContent = lastProcess;
+                document.getElementById('modal-details').textContent = details;
+
+                document.getElementById('modal-status').innerHTML = `
+                    <span class="badge ${statusClass} px-3 py-2 rounded-pill fs-6">
+                        <i class="${statusIcon} me-1"></i>${status}
+                    </span>
+                `;
+
+                document.getElementById('modal-priority').innerHTML = `
+                    <span class="badge bg-light text-dark px-3 py-2 rounded-pill fs-6">
+                        <i class="${priorityIcon} me-1"></i>${priority}
+                    </span>
+                `;
+
+                showModal();
+            });
+        });
+
+        // Düzenle örnek (şimdilik)
+        const dummyEditBtn = document.getElementById('dummyEditBtn');
+        if (dummyEditBtn) {
+            dummyEditBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                alert("Düzenleme modalını bir sonraki adımda ekleyelim kral 👑");
+            });
+        }
+
+        // Kapat butonu fallback (bazı temalarda dismiss yakalanmıyor)
+        document.querySelectorAll('#reservationDetailModal [data-bs-dismiss="modal"]').forEach(x => {
+            x.addEventListener('click', function (e) {
+                // dismiss çalışsa da çalışmasa da garanti kapansın
+                setTimeout(hideModal, 0);
+            });
+        });
+    });
+</script>
