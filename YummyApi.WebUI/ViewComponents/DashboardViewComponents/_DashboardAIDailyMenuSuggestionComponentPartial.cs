@@ -6,70 +6,79 @@ using YummyApi.WebUI.DTOs.AISuggestionDTOs;
 
 namespace YummyApi.WebUI.ViewComponents.DashboardViewComponents
 {
-    public class _DashboardAIDailyMenuSuggestionComponentPartial:ViewComponent
+    public class _DashboardAIDailyMenuSuggestionComponentPartial : ViewComponent
     {
-        private const string OPENAI_API_KEY = "";
-
         private readonly IHttpClientFactory _httpClientFactory;
-        public _DashboardAIDailyMenuSuggestionComponentPartial(IHttpClientFactory httpClientFactory)
+        private readonly IConfiguration _configuration;
+
+        public _DashboardAIDailyMenuSuggestionComponentPartial(
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
+            _configuration = configuration;
         }
+
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            var openAiClient = _httpClientFactory.CreateClient();
-            openAiClient.BaseAddress = new Uri("https://api.openai.com/");
-            openAiClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", OPENAI_API_KEY);
+            var apiKey = _configuration["Groq:ApiKey"];
 
-            string prompt = @"
-4 farklı dünya mutfağından tamamen rastgele günlük menü oluştur.
+            if (string.IsNullOrEmpty(apiKey))
+                return View(new List<MenuSuggestionDTO>());
 
-ÖNEMLİ KURALLAR:
-- Mutlaka 4 FARKLI ülke mutfağı seç.
-- Daha önce seçtiğin mutfakları tekrar etme (iç mantığında çeşitlilik üret).
-- Popüler olmayan mutfaklardan da seçebilirsin (örneğin Peru, Tayland, Fas, İran, Kore, Şili, Portekiz, Endonezya, Lübnan vb.).
-- Ülkeleri HER SEFERİNDE FARKLI seç.
-- Tüm içerik TÜRKÇE olacak.
-- Ülke adını Türkçe yaz (ör: “Peru Mutfağı”).
-- ISO Country Code zorunlu (ör: PE, TH, MA, IR, KR vb.)
-- Örnek vermiyorum, tamamen özgün üret.
-- Cevap sadece geçerli JSON olsun.
+            var client = _httpClientFactory.CreateClient();
+            client.BaseAddress = new Uri("https://api.groq.com/openai/v1/");
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", apiKey);
 
-JSON formatı:
-[
-  {
-    ""Cuisine"": ""X Mutfağı"",
-    ""CountryCode"": ""XX"",
-    ""MenuTitle"": ""Günlük Menü"",
-    ""Items"": [
-      { ""Name"": ""Yemek 1"", ""Description"": ""Açıklama"", ""Price"": 100 },
-      { ""Name"": ""Yemek 2"", ""Description"": ""Açıklama"", ""Price"": 120 },
-      { ""Name"": ""Yemek 3"", ""Description"": ""Açıklama"", ""Price"": 90 },
-      { ""Name"": ""Yemek 4"", ""Description"": ""Açıklama"", ""Price"": 70 }
-    ]
-  }
-]
-";
+            string prompt =
+                "4 farklı dünya mutfağından tamamen rastgele günlük menü oluştur.\n\n" +
+                "KURALLAR:\n" +
+                "- 4 farklı ülke mutfağı\n" +
+                "- Türkçe olacak\n" +
+                "- ISO Country Code zorunlu\n" +
+                "- SADECE JSON DÖNDÜR\n\n" +
+                "FORMAT:\n" +
+                "[\n" +
+                "  {\n" +
+                "    \"Cuisine\": \"X Mutfağı\",\n" +
+                "    \"CountryCode\": \"XX\",\n" +
+                "    \"MenuTitle\": \"Günlük Menü\",\n" +
+                "    \"Items\": [\n" +
+                "      { \"Name\": \"Yemek\", \"Description\": \"Açıklama\", \"Price\": 100 }\n" +
+                "    ]\n" +
+                "  }\n" +
+                "]";
 
             var body = new
             {
-                model = "gpt-4.1-mini",   // istersen değiştir
+                model = "llama-3.1-8b-instant", // ✅ DOĞRU MODEL
                 messages = new[]
                 {
-                new { role = "system", content = "Sadece JSON üret." },
-                new { role = "user", content = prompt }
-            }
+                    new { role = "system", content = "Return ONLY valid JSON. No markdown." },
+                    new { role = "user", content = prompt }
+                }
             };
 
-            var jsonBody = JsonConvert.SerializeObject(body);
-            var content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+            var content = new StringContent(
+                JsonConvert.SerializeObject(body),
+                Encoding.UTF8,
+                "application/json"
+            );
 
-            var response = await openAiClient.PostAsync("v1/chat/completions", content);
+            var response = await client.PostAsync("chat/completions", content);
             var responseJson = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+                return View(new List<MenuSuggestionDTO>());
 
             dynamic obj = JsonConvert.DeserializeObject(responseJson);
             string aiContent = obj.choices[0].message.content.ToString();
+
+            aiContent = aiContent
+                .Replace("```json", "")
+                .Replace("```", "")
+                .Trim();
 
             List<MenuSuggestionDTO> menus;
 
@@ -79,7 +88,7 @@ JSON formatı:
             }
             catch
             {
-                menus = new();
+                menus = new List<MenuSuggestionDTO>();
             }
 
             return View(menus);
