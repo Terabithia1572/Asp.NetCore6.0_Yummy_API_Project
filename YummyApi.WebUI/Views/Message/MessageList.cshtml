@@ -5,203 +5,280 @@
     int count = 0;
 }
 
+
+<style>
+    .modern-card {
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        border: none;
+    }
+
+    .messages-container {
+        padding: 1.5rem;
+    }
+
+    .message-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid #667eea;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+        .message-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+            border-left-color: #764ba2;
+        }
+
+    .message-number {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+
+    .message-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .message-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .sender-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sender-email {
+        color: #667eea;
+        font-size: 0.85rem;
+        background: #f8f9ff;
+        padding: 0.25rem 0.7rem;
+        border-radius: 12px;
+    }
+
+    .message-date {
+        color: #999;
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .message-subject {
+        font-size: 0.95rem;
+        color: #555;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+
+    .message-preview {
+        color: #999;
+        font-size: 0.85rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .message-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .modern-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .modern-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+    .btn-open {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        color: white;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #999;
+    }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+
+    .subject-icon {
+        color: #667eea;
+        margin-right: 0.3rem;
+    }
+
+    @@media (max-width: 768px) {
+        .message-item
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .message-actions {
+        justify-content: flex-start;
+    }
+
+    }
+</style>
+
 <section class="section">
     <div class="section-body">
         <div class="row">
-            <div class="col-12 col-md-12 col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Gelen Mesaj Listesi</h4>
+            <div class="col-12">
+                <div class="card modern-card">
+                    <div class="card-header" style="background: white; border-bottom: 2px solid #f0f0f0; border-radius: 15px 15px 0 0;">
+                        <h4 style="color: #667eea; font-weight: 700; margin: 0;">
+                            <i class="fas fa-inbox" style="margin-right: 10px;"></i>
+                            Gelen Mesaj Listesi
+                        </h4>
+                        <div class="card-header-action">
+                            <a href="/Message/CreateMessage/" class="modern-btn btn-create">
+                                <i class="fas fa-plus"></i>
+                                Yeni Mesaj Oluştur
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Gönderici Ad Soyad</th>
-                                    <th scope="col">Gönderici E-Mail</th>
-                                    <th scope="col">Mesaj Konusu</th>
-                                    <th scope="col">Mesaj Tarihi</th>
-                                    <th scope="col">Mesajı Aç</th>
-                                    <th scope="col">Sil</th>
-                                    <th scope="col">Güncelle</th>
-                                    <th>AI</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    <div class="card-body" style="padding: 0;">
+                        @if (Model.Count > 0)
+                        {
+                            <div class="messages-container">
                                 @foreach (var item in Model)
                                 {
                                     count++;
-                                    <tr>
-                                        <th scope="row">@count</th>
-                                        <td>@item.MessageNameSurname</td>
-                                        <td>@item.MessageEmail</td>
-                                        <td>@item.MessageSubject</td>
-                                        <td>@item.SendDate.ToString("dd MMM yyyy")</td>
+                                    <div class="message-item">
+                                        <div class="message-number">
+                                            @count
+                                        </div>
 
-                                        <!-- Modal tetikleyen buton -->
-                                        <td>
-                                            <button type="button"
-                                                    class="btn btn-warning btn-open-message"
-                                                    data-id="@item.MessageID">
-                                                Aç
-                                            </button>
-                                        </td>
+                                        <div class="message-content">
+                                            <div class="message-header">
+                                                <div class="sender-name">
+                                                    <i class="fas fa-user-circle"></i>
+                                                    @item.MessageNameSurname
+                                                </div>
+                                                <div class="sender-email">
+                                                    <i class="fas fa-envelope"></i>
+                                                    @item.MessageEmail
+                                                </div>
+                                                <div class="message-date">
+                                                    <i class="far fa-calendar-alt"></i>
+                                                    @item.SendDate.ToString("dd MMM yyyy")
+                                                </div>
+                                            </div>
 
-                                        <td><a href="/Message/DeleteMessage/@item.MessageID/" class="btn btn-danger">Sil</a></td>
-                                        <td><a href="/Message/UpdateMessage/@item.MessageID/" class="btn btn-info">Güncelle</a></td>
-                                        <td><a href="/Message/AnswerMessageWithOpenAI/@item.MessageID/" class="btn btn-primary">AI</a></td>
-                                    </tr>
+                                            <div class="message-subject">
+                                                <i class="fas fa-tag subject-icon"></i>
+                                                <strong>Konu:</strong> @item.MessageSubject
+                                            </div>
+
+                                            @if (!string.IsNullOrEmpty(item.MessageDetail))
+                                            {
+                                                <div class="message-preview">
+                                                    <i class="fas fa-comment-dots" style="color: #ccc; margin-right: 0.3rem;"></i>
+                                                    @item.MessageDetail
+                                                </div>
+                                            }
+                                        </div>
+
+                                        <div class="message-actions">
+                                            <a href="/Message/AsnwerMessageWithOpenAI/@item.MessageID/" class="modern-btn btn-open" title="Mesajı Aç">
+                                                <i class="fas fa-envelope-open"></i>
+                                                Mesajı Aç
+                                            </a>
+                                            <a href="/Message/UpdateMessage/@item.MessageID/" class="modern-btn btn-edit" title="Düzenle">
+                                                <i class="fas fa-edit"></i>
+                                                Düzenle
+                                            </a>
+                                            <a href="/Message/DeleteMessage/@item.MessageID/" class="modern-btn btn-delete" title="Sil" onclick="return confirm('Bu mesajı silmek istediğinize emin misiniz?');">
+                                                <i class="fas fa-trash-alt"></i>
+                                                Sil
+                                            </a>
+                                        </div>
+                                    </div>
                                 }
-                            </tbody>
-                        </table>
-
-                        <a href="/Message/CreateMessage/" class="btn btn-success">Yeni Mesaj Ekle</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="messages-container">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>Henüz gelen mesaj bulunmamaktadır.</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="card-footer" style="background: white; border-top: 2px solid #f0f0f0;">
+                        <div style="color: #999; font-size: 0.875rem;">
+                            <i class="fas fa-info-circle"></i>
+                            Toplam <strong style="color: #667eea;">@Model.Count</strong> mesaj listelendi
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
-
-<!-- Mesaj Detay Modal -->
-<div class="modal fade" id="messageDetailModal" tabindex="-1" role="dialog" aria-labelledby="messageDetailModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    Mesaj Detayı
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <div class="modal-body">
-                <!-- Yükleniyor -->
-                <div id="msgLoading" class="text-center my-3" style="display:none;">
-                    <div class="spinner-border" role="status"></div>
-                    <div>Yükleniyor…</div>
-                </div>
-
-                <!-- Hata -->
-                <div id="msgError" class="alert alert-danger" style="display:none;"></div>
-
-                <!-- İçerik -->
-                <dl id="msgContent" class="row" style="display:none;">
-                    <dt class="col-sm-3">Gönderici</dt>
-                    <dd class="col-sm-9" id="mSender"></dd>
-
-                    <dt class="col-sm-3">E-Mail</dt>
-                    <dd class="col-sm-9" id="mEmail"></dd>
-
-                    <dt class="col-sm-3">Konu</dt>
-                    <dd class="col-sm-9" id="mSubject"></dd>
-
-                    <dt class="col-sm-3">Tarih</dt>
-                    <dd class="col-sm-9" id="mDate"></dd>
-
-                    <dt class="col-sm-3">Mesaj</dt>
-                    <dd class="col-sm-9" id="mBody" style="white-space:pre-wrap;"></dd>
-                </dl>
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Scripts: Layout'a dokunmadan, section kullanmadan -->
-<script>
-    (function(){
-      // API kökü (Controller'da kullandığınızla aynı olmalı)
-      const API_BASE = "https://localhost:44368";
-
-      function formatDate(isoStr){
-        try{
-          const d = new Date(isoStr);
-          return d.toLocaleString('tr-TR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
-        }catch(e){ return isoStr; }
-      }
-
-      function showLoader(){
-        document.getElementById('msgLoading').style.display='block';
-        document.getElementById('msgError').style.display='none';
-        document.getElementById('msgContent').style.display='none';
-      }
-
-      function showError(msg){
-        document.getElementById('msgLoading').style.display='none';
-        const err = document.getElementById('msgError');
-        err.textContent = msg || 'Bir hata oluştu.';
-        err.style.display='block';
-      }
-
-         function fillContent(m){
-      // Hem PascalCase hem camelCase için güvenli eşleme
-      const name    = m.MessageNameSurname ?? m.messageNameSurname ?? '';
-      const email   = m.MessageEmail       ?? m.messageEmail       ?? '';
-      const subject = m.MessageSubject     ?? m.messageSubject     ?? '';
-      const dateVal = m.SendDate           ?? m.sendDate           ?? '';
-
-      // İÇERİK: MessageDetail alanını kullan!
-      const body =
-        m.MessageDetail   ?? m.messageDetail ??   // <<-- VERİTABANI/DTO ALANI
-        m.MessageContent  ?? m.messageContent ??
-        m.Content         ?? m.content        ??
-        m.Body            ?? m.body           ?? '';
-
-      document.getElementById('mSender').textContent  = name;
-      document.getElementById('mEmail').textContent   = email;
-      document.getElementById('mSubject').textContent = subject;
-      document.getElementById('mDate').textContent    = dateVal
-        ? (function(d){ try{ return new Date(d).toLocaleString('tr-TR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return d;} })(dateVal)
-        : '';
-      document.getElementById('mBody').textContent = body;
-
-      document.getElementById('msgLoading').style.display='none';
-      document.getElementById('msgError').style.display='none';
-      document.getElementById('msgContent').style.display='flex';
-    }
-
-    async function fetchMessage(id){
-      // ESKİ: const url = `${API_BASE}/api/Messages/GetMessage?id=${encodeURIComponent(id)}`;
-      const url = `/Message/GetMessageJson?id=${encodeURIComponent(id)}`; // same-origin
-      const res = await fetch(url, { method:'GET' });
-      if(!res.ok) throw new Error('Sunucu hatası: ' + res.status);
-      return await res.json();
-    }
-
-
-      // jQuery ve Bootstrap modal yüklü ise bu çalışır
-      document.addEventListener('click', async (e)=>{
-        const btn = e.target.closest('.btn-open-message');
-        if(!btn) return;
-
-        const id = btn.getAttribute('data-id');
-
-        // Modal'ı aç
-        if (window.jQuery && $('#messageDetailModal').modal) {
-          $('#messageDetailModal').modal('show');
-        } else {
-          // jQuery yoksa en azından içeriği dolduralım; modal için bootstrap JS gerekir.
-          console.warn('Bootstrap modal için jQuery/Bootstrap JS gerekli.');
-          document.getElementById('messageDetailModal').style.display = 'block';
-        }
-
-        showLoader();
-
-        try{
-          const data = await fetchMessage(id);
-          // API doğrudan DTO dönüyorsa:
-          fillContent(data);
-          // Eğer { data: {...} } dönüyorsa: fillContent(data.data);
-        }catch(err){
-          console.error(err);
-          showError('Mesaj detayı getirilemedi. Lütfen tekrar deneyin.');
-        }
-      });
-    })();
-</script>
