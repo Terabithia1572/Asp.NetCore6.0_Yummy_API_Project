@@ -68,5 +68,62 @@ namespace YummyApi.WebApi.Controllers
             _context.SaveChanges();
             return Ok("Rezervasyon Güncelleme İşlemi Başarılı.."); //200 kodu döner Rezervasyon güncelleme işlemi başarılı
         }
+        [HttpGet("GetTotalReservationCount")]
+        public IActionResult GetTotalReservationCount()
+        {
+            var totalReservations = _context.Reservations.Count();
+            return Ok(totalReservations); //200 kodu döner ve toplam rezervasyon sayısını getirir
+        }
+        [HttpGet("GetTotalCustomerCount")]
+        public IActionResult GetTotalCustomerCount()
+        {
+            var totalCustomer = _context.Reservations.Sum(x=>x.CountOfPeople);
+            return Ok(totalCustomer); //200 kodu döner ve toplam rezervasyon sayısını getirir
+        }
+        [HttpGet("GetPendingReservation")]
+        public IActionResult GetPendingReservation()
+        {
+            var totalCustomer = _context.Reservations.Where(x => x.ReservationStatus=="Onay Bekliyor").Count();
+            return Ok(totalCustomer); //200 kodu döner ve toplam rezervasyon sayısını getirir
+        }
+        [HttpGet("GetApprovedReservation")]
+        public IActionResult GetApprovedReservation()
+        {
+            var totalCustomer = _context.Reservations.Where(x => x.ReservationStatus == "Onaylandı").Count();
+            return Ok(totalCustomer); //200 kodu döner ve toplam rezervasyon sayısını getirir
+        }
+        [HttpGet("GetReservationStats")]
+        public IActionResult GetReservationStats()
+        {
+            DateTime today = DateTime.Today; // Bugünün tarihi
+            DateTime fourMonthsAgo = today.AddMonths(-3); // 3 ay öncesinin tarihi
+
+            // 1. SQL tarafında sadece gruplama ve veri çekme
+            var rawData = _context.Reservations // DbSet'inden başla
+                .Where(r => r.ReservationDate >= fourMonthsAgo) // Son 3 ayın verisi
+                .GroupBy(r => new { r.ReservationDate.Year, r.ReservationDate.Month }) // Yıl ve aya göre grupla
+                .Select(g => new // Grup içindeki verilere göre yeni bir anonim nesne oluştur
+                {
+                    g.Key.Year, // Yıl
+                    g.Key.Month, // Ay
+                    Approved = g.Count(x => x.ReservationStatus == "Onaylandı"), // Duruma göre say
+                    Pending = g.Count(x => x.ReservationStatus == "Onay Bekliyor"), // Duruma göre say
+                    Canceled = g.Count(x => x.ReservationStatus == "İptal Edildi") // Duruma göre say
+                })
+                .OrderBy(x => x.Year).ThenBy(x => x.Month) // Yıla ve aya göre sırala
+                .ToList(); // Burala kadar SQL tarafında çalışır ve veriyi belleğe alır ve bir liste oluşturur
+
+            // 2. Bellekte DTO'ya mapleme + tarih formatlama 
+            var result = rawData.Select(x => new ReservationChartDTO // DTO'ya mapleme
+            {
+                Month = new DateTime(x.Year, x.Month, 1).ToString("MMM yyyy"), // Ay adını ve yılı al
+                Approved = x.Approved, // Durum sayıları    
+                Pending = x.Pending, // Durum sayıları 
+                Canceled = x.Canceled // Durum sayıları
+            }).ToList();
+
+            return Ok(result);
+        }
+
     }
 }

@@ -12,8 +12,8 @@ using YummyApi.WebApi.Context;
 namespace YummyApi.WebApi.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    [Migration("20250403131109_mig_Category_Product_Relations_Added")]
-    partial class mig_Category_Product_Relations_Added
+    [Migration("20251214112859_mig3")]
+    partial class mig3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,43 @@ namespace YummyApi.WebApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("YummyApi.WebApi.Entities.About", b =>
+                {
+                    b.Property<int>("AboutID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AboutID"), 1L, 1);
+
+                    b.Property<string>("AboutDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AboutImageURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AboutTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AboutVideoCoverImageURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AboutVideoURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReservationNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("AboutID");
+
+                    b.ToTable("Abouts");
+                });
 
             modelBuilder.Entity("YummyApi.WebApi.Entities.Category", b =>
                 {
@@ -103,6 +140,63 @@ namespace YummyApi.WebApi.Migrations
                     b.ToTable("Contacts");
                 });
 
+            modelBuilder.Entity("YummyApi.WebApi.Entities.EmployeeTask", b =>
+                {
+                    b.Property<int>("EmployeeTaskId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EmployeeTaskId"), 1L, 1);
+
+                    b.Property<DateTime>("AssignDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TaskName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TaskStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte>("TaskStatusValue")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("EmployeeTaskId");
+
+                    b.ToTable("EmployeeTasks");
+                });
+
+            modelBuilder.Entity("YummyApi.WebApi.Entities.EmployeeTaskChef", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("ChefId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EmployeeTaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChefId");
+
+                    b.HasIndex("EmployeeTaskId");
+
+                    b.ToTable("EmployeeTaskChefs");
+                });
+
             modelBuilder.Entity("YummyApi.WebApi.Entities.Feature", b =>
                 {
                     b.Property<int>("FeatureID")
@@ -134,6 +228,51 @@ namespace YummyApi.WebApi.Migrations
                     b.HasKey("FeatureID");
 
                     b.ToTable("Features");
+                });
+
+            modelBuilder.Entity("YummyApi.WebApi.Entities.GroupReservation", b =>
+                {
+                    b.Property<int>("GroupReservationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GroupReservationID"), 1L, 1);
+
+                    b.Property<DateTime>("GroupReservationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GroupReservationDetails")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GroupReservationEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("GroupReservationLastProcessDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("GroupReservationPersonCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("GroupReservationPriority")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GroupReservationStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GroupReservationTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponsibleCustomerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("GroupReservationID");
+
+                    b.ToTable("GroupReservations");
                 });
 
             modelBuilder.Entity("YummyApi.WebApi.Entities.Image", b =>
@@ -180,6 +319,9 @@ namespace YummyApi.WebApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("MessageStatus")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("MessageSubject")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -190,6 +332,33 @@ namespace YummyApi.WebApi.Migrations
                     b.HasKey("MessageID");
 
                     b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("YummyApi.WebApi.Entities.Notification", b =>
+                {
+                    b.Property<int>("NotificationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationID"), 1L, 1);
+
+                    b.Property<DateTime>("NotificationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("NotificationDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NotificationIconURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("NotificationIsRead")
+                        .HasColumnType("bit");
+
+                    b.HasKey("NotificationID");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("YummyApi.WebApi.Entities.Product", b =>
@@ -322,6 +491,56 @@ namespace YummyApi.WebApi.Migrations
                     b.ToTable("Testimonials");
                 });
 
+            modelBuilder.Entity("YummyApi.WebApi.Entities.YummyEvent", b =>
+                {
+                    b.Property<int>("YummyEventID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("YummyEventID"), 1L, 1);
+
+                    b.Property<string>("YummyEventDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("YummyEventImageURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("YummyEventPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("YummyEventStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("YummyEventTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("YummyEventID");
+
+                    b.ToTable("YummyEvents");
+                });
+
+            modelBuilder.Entity("YummyApi.WebApi.Entities.EmployeeTaskChef", b =>
+                {
+                    b.HasOne("YummyApi.WebApi.Entities.Chef", "Chef")
+                        .WithMany("EmployeeTaskChefs")
+                        .HasForeignKey("ChefId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("YummyApi.WebApi.Entities.EmployeeTask", "EmployeeTask")
+                        .WithMany("EmployeeTaskChefs")
+                        .HasForeignKey("EmployeeTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chef");
+
+                    b.Navigation("EmployeeTask");
+                });
+
             modelBuilder.Entity("YummyApi.WebApi.Entities.Product", b =>
                 {
                     b.HasOne("YummyApi.WebApi.Entities.Category", "Category")
@@ -334,6 +553,16 @@ namespace YummyApi.WebApi.Migrations
             modelBuilder.Entity("YummyApi.WebApi.Entities.Category", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("YummyApi.WebApi.Entities.Chef", b =>
+                {
+                    b.Navigation("EmployeeTaskChefs");
+                });
+
+            modelBuilder.Entity("YummyApi.WebApi.Entities.EmployeeTask", b =>
+                {
+                    b.Navigation("EmployeeTaskChefs");
                 });
 #pragma warning restore 612, 618
         }

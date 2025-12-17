@@ -9,5 +9,6 @@
         public string MessageDetail { get; set; } //Mesaj Detay
         public DateTime SendDate { get; set; } //Mesaj Tarihi
         public bool MessageIsRead { get; set; } //Mesaj Okundu mu 
+        public string? MessageStatus { get; set; } //Mesaj Durumu
     }
 }

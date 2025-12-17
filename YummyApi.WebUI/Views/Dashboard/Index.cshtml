@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/AdminLayout/Index.cshtml";
+}
+
+<section class="section">
+    @await Component.InvokeAsync("_DashboardWidgetsComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan Widgets verilerini tutuyor-->
+    @await Component.InvokeAsync("_DashboardMainChartComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan Main Chart verilerini tutuyor-->
+    <div class="row">
+        <div class="col-12 col-sm-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Chart</h4>
+                </div>
+                <div class="card-body">
+                    <div id="chart4" class="chartsh"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Chart</h4>
+                </div>
+                <div class="card-body">
+                    <div class="summary">
+                        <div class="summary-chart active" data-tab-group="summary-tab" id="summary-chart">
+                            <div id="chart3" class="chartsh"></div>
+                        </div>
+                        <div data-tab-group="summary-tab" id="summary-text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Chart</h4>
+                </div>
+                <div class="card-body">
+                    <div id="chart2" class="chartsh"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @* @await Component.InvokeAsync("_DashboardEmployeeTaskComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan Employee Task verilerini tutuyor--> *@
+    @await Component.InvokeAsync("_DashboardGroupReservationComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan Employee Task verilerini tutuyor-->
+
+   
+    <div class="row">
+        @await Component.InvokeAsync("_DashboardAIDailyMenuSuggestionComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan AI Daily Menu Suggestion verilerini tutuyor-->
+        @await Component.InvokeAsync("_DashboardClaudeAIComponentPartial") <!--Burası Bizim Dashboard kısmında bulunan Claude AI verilerini tutuyor-->
+    </div>
+</section>
+
+<script src="~/otika/assets/js/app.min.js"></script>
+<!-- JS Libraies -->
+<script src="~/otika/assets/bundles/apexcharts/apexcharts.min.js"></script>
+<!-- Page Specific JS File -->
+<script src="~/otika/assets/js/page/index.js"></script>
+<!-- Template JS File -->
+<script src="~/otika/assets/js/scripts.js"></script>
+<!-- Custom JS File -->
+<script src="~/otika/assets/js/custom.js"></script>
+
+
