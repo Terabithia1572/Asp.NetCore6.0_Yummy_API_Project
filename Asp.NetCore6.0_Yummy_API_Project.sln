@@ -1,11 +1,38 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11310.294
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YummyApi.WebApi", "YummyApi.WebApi\YummyApi.WebApi.csproj", "{9A9AD936-BABF-437A-BF35-383B27FB9208}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YummyApi.WebUI", "YummyApi.WebUI\YummyApi.WebUI.csproj", "{F31CB0E1-A8EE-4F97-BE83-3F231316BBF2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{DCD4C244-AC5D-4AB6-9390-C06DC72A749E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "screenshots", "screenshots", "{4E8A14DE-6C5B-4743-BC76-08B5A0407804}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Downloads\YummySS\Dashboard\01-dashboard.png = ..\..\..\Downloads\YummySS\Dashboard\01-dashboard.png
+		..\..\..\Downloads\YummySS\Default\01-home.png = ..\..\..\Downloads\YummySS\Default\01-home.png
+		..\..\..\Downloads\YummySS\Default\02-about.png = ..\..\..\Downloads\YummySS\Default\02-about.png
+		..\..\..\Downloads\YummySS\Dashboard\02-messages.png = ..\..\..\Downloads\YummySS\Dashboard\02-messages.png
+		..\..\..\Downloads\YummySS\Default\03-produtcs.png = ..\..\..\Downloads\YummySS\Default\03-produtcs.png
+		..\..\..\Downloads\YummySS\Dashboard\03-reservations.png = ..\..\..\Downloads\YummySS\Dashboard\03-reservations.png
+		..\..\..\Downloads\YummySS\Dashboard\04-events.png = ..\..\..\Downloads\YummySS\Dashboard\04-events.png
+		..\..\..\Downloads\YummySS\Default\04-events.png = ..\..\..\Downloads\YummySS\Default\04-events.png
+		..\..\..\Downloads\YummySS\Default\05-chefs.png = ..\..\..\Downloads\YummySS\Default\05-chefs.png
+		..\..\..\Downloads\YummySS\Dashboard\05-whychoose.png = ..\..\..\Downloads\YummySS\Dashboard\05-whychoose.png
+		..\..\..\Downloads\YummySS\Dashboard\06-abouts.png = ..\..\..\Downloads\YummySS\Dashboard\06-abouts.png
+		..\..\..\Downloads\YummySS\Default\06-reservation.png = ..\..\..\Downloads\YummySS\Default\06-reservation.png
+		..\..\..\Downloads\YummySS\Default\07-contact.png = ..\..\..\Downloads\YummySS\Default\07-contact.png
+		..\..\..\Downloads\YummySS\Dashboard\07-features.png = ..\..\..\Downloads\YummySS\Dashboard\07-features.png
+		..\..\..\Downloads\YummySS\Default\08-features.png = ..\..\..\Downloads\YummySS\Default\08-features.png
+		..\..\..\Downloads\YummySS\Dashboard\08-products.png = ..\..\..\Downloads\YummySS\Dashboard\08-products.png
+		..\..\..\Downloads\YummySS\Dashboard\09-category.png = ..\..\..\Downloads\YummySS\Dashboard\09-category.png
+		..\..\..\Downloads\YummySS\Default\09-testimonials.png = ..\..\..\Downloads\YummySS\Default\09-testimonials.png
+		..\..\..\Downloads\YummySS\Dashboard\10-chart.png = ..\..\..\Downloads\YummySS\Dashboard\10-chart.png
+		..\..\..\Downloads\YummySS\Default\10-mapping.png = ..\..\..\Downloads\YummySS\Default\10-mapping.png
+		..\..\..\Downloads\YummySS\Dashboard\11-chart.png = ..\..\..\Downloads\YummySS\Dashboard\11-chart.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,5 +51,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4E8A14DE-6C5B-4743-BC76-08B5A0407804} = {DCD4C244-AC5D-4AB6-9390-C06DC72A749E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BC1B4028-6729-48BD-BE30-C5B9FE63FED1}
 	EndGlobalSection
 EndGlobal
